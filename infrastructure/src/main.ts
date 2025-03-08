@@ -18,7 +18,7 @@ export class ApplicationStack extends Stack {
     // Create a load-balanced Fargate service and make it public
     new aws_ecs_patterns.ApplicationLoadBalancedFargateService(this, 'Laravel', {
       cluster: cluster,
-      taskImageOptions: { image: aws_ecs.ContainerImage.fromAsset(path.join(__dirname, '../laravel-app/sampleApp')) },
+      taskImageOptions: { image: aws_ecs.ContainerImage.fromAsset(path.join(__dirname, '../../sampleApp/')) },
       publicLoadBalancer: true, // Default is true
       enableExecuteCommand: true
     });
