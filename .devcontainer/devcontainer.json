@@ -1,50 +1,26 @@
+// https://aka.ms/devcontainer.json
 {
-  "name": "Debian",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "INSTALL_ZSH": "true",
-      "USER_UID": "1000",
-      "USER_GID": "1000"
-    }
-  },
-  "workspaceFolder": "/home/vscode/laravel-starter",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/laravel-starter,type=bind,consistency=delegated",
-  "runArgs": [
-    "--init",
-    "--privileged"
-  ],
-  "forwardPorts": [
-    8080
-  ],
-  "customizations": {
-    "settings": {
-      "terminal.integrated.defaultProfile.linux": "zsh",
-    },
-    "vscode": {
-      "extensions": [
-        // Helps with tailwind css class completion
-        "bradlc.vscode-tailwindcss",
-
-        // Nice quality of life when it comes to vue
-        "znck.vue",
-        "Vue.volar",
-
-        // Used for PHP debugging
-        "xdebug.php-debug"
-      ]
-    }
-  },
-  "remoteUser": "vscode",
-  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/php:1": {
-      "installComposer": true
-    },
-    "ghcr.io/devcontainers/features/node:1": {},
-    },
-  "containerEnv": {
-    "APP_PORT": "8080"
-  },
-  "postCreateCommand": "echo 'export PATH=\"$PATH:$HOME/.composer/vendor/bin\"' >> ~/.bashrc"
+	"name": "Existing Docker Compose (Extend)",
+	"dockerComposeFile": [
+		"../docker-compose.yml"
+	],
+	"service": "laravel.test",
+	"workspaceFolder": "/var/www/html",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				// "mikestead.dotenv",
+				// "amiralizadeh9480.laravel-extra-intellisense",
+				// "ryannaddy.laravel-artisan",
+				// "onecentlin.laravel5-snippets",
+				// "onecentlin.laravel-blade"
+			],
+			"settings": {}
+		}
+	},
+	"remoteUser": "sail",
+	"postCreateCommand": "chown -R 1000:1000 /var/www/html 2>/dev/null || true"
+	// "forwardPorts": [],
+	// "runServices": [],
+	// "shutdownAction": "none",
 }
