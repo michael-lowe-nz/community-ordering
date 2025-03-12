@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('price_range')->nullable();
             $table->string('opening_hours')->nullable();
             $table->text('description')->nullable();
+            $table->text('website')->nullable();
             $table->text('google_place_id');
             $table->timestamps();
         });

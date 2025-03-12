@@ -58,31 +58,38 @@ class RestaurantSeeder extends Seeder
         
         do {
             // Build the API request
-            $endpoint = 'https://places.googleapis.com/v1/places:searchNearby';
-            // $endpoint = 'https://places.googleapis.com/v1/places:searchText';
+            // $endpoint = 'https://places.googleapis.com/v1/places:searchNearby';
+            $endpoint = 'https://places.googleapis.com/v1/places:searchText';
             
             [$lat, $lng] = explode(',', $city['location']);
             
             $requestBody = [
-                // 'maxResultCount' => 20,
-                // 'textQuery' => sprintf('cafes in %s', $city['name']),
+                'maxResultCount' => 20,
+                'textQuery' => sprintf('chinese restaurants in %s', $city['name']),
                 // 'fieldMask' => 'places.displayName,places.formattedAddress,places.priceLevel',
-                'locationRestriction' => [
-                    'circle' => [
-                        'center' => [
-                            'latitude' => (float)$lat,
-                            'longitude' => (float)$lng
-                        ],
-                        'radius' => (float)$city['radius']
-                    ]
-                ]
+                // 'locationRestriction' => [
+                //     'circle' => [
+                //         'center' => [
+                //             'latitude' => (float)$lat,
+                //             'longitude' => (float)$lng
+                //         ],
+                //         'radius' => (float)$city['radius']
+                //     ]
+                // ]
             ];
             
             // Make the API request
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Goog-Api-Key' => $apiKey,
-                'X-Goog-FieldMask' => 'places.displayName,places.formattedAddress,places.priceLevel,places.id',
+                'X-Goog-FieldMask' => implode(',', [
+                    'places.displayName',
+                    'places.formattedAddress', 
+                    'places.priceLevel',
+                    'places.id',
+                    'places.nationalPhoneNumber',
+                    'places.websiteUri'
+                ]),
             ])->post($endpoint, $requestBody);
             
             if (!$response->successful()) {
@@ -125,12 +132,9 @@ class RestaurantSeeder extends Seeder
             $existingRestaurant->update([
                 'name' => $place['displayName']['text'],
                 'google_place_id' => $place['id'],
-                // 'address' => $place['vicinity'],
-                // 'latitude' => $place['geometry']['location']['lat'],
-                // 'longitude' => $place['geometry']['location']['lng'],
-                // 'rating' => $place['rating'] ?? null,
-                // 'price_level' => $place['price_level'] ?? null,
-                // 'city' => $cityName,
+                'address' => $place['formattedAddress'],
+                'phone' => $place['nationalPhoneNumber'] ?? null,
+                'website' => $place['websiteUri'] ?? null,
                 'updated_at' => Carbon::now(),
             ]);
         } else {
@@ -138,13 +142,9 @@ class RestaurantSeeder extends Seeder
             Restaurant::create([
                 'name' => $place['displayName']['text'],
                 'google_place_id' => $place['id'],
-                // 'address' => $place['vicinity'],
-                // 'latitude' => $place['geometry']['location']['lat'],
-                // 'longitude' => $place['geometry']['location']['lng'],
-                // 'rating' => $place['rating'] ?? null,
-                // 'price_level' => $place['price_level'] ?? null,
-                // 'photo_reference' => $place['photos'][0]['photo_reference'] ?? null,
-                // 'city' => $cityName,
+                'address' => $place['formattedAddress'],
+                'phone' => $place['nationalPhoneNumber'] ?? null,
+                'website' => $place['websiteUri'] ?? null,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);

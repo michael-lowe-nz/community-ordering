@@ -18,6 +18,9 @@
                     @if($restaurant->phone)
                         <p class="text-gray-600 mb-2">📞 {{ $restaurant->phone }}</p>
                     @endif
+                    @if($restaurant->website)
+                        <p class="text-gray-600 mb-2">🍽️ {{ $restaurant->website }}</p>
+                    @endif
                     @if($restaurant->cuisine_type)
                         <p class="text-gray-600 mb-2">🍽️ {{ $restaurant->cuisine_type }}</p>
                     @endif

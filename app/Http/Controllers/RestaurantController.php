@@ -9,7 +9,7 @@ class RestaurantController
 {
     public function index()
     {
-        $restaurants = Restaurant::all();
+        $restaurants = Restaurant::orderBy('name', 'asc')->get();
         return view('restaurants.index', compact('restaurants'));
     }
 
