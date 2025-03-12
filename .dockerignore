@@ -1,0 +1,4 @@
+infrastructure/
+.env
+.git
+.idea

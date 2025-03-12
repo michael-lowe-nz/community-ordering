@@ -1,19 +1,53 @@
-FROM --platform=linux/amd64 node:latest
+# Use the official PHP-FPM image as the base
+FROM public.ecr.aws/docker/library/php:fpm
 
-WORKDIR /usr/src/app
+# Define a user variable
+ARG user=www-data
 
-RUN echo "Heya man"
+# Install system dependencies and PHP extensions
+RUN apt-get update && apt-get install -y \
+    git curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip unzip libzip-dev \
+    nginx \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-install \
+        pdo_mysql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install dependencies
-RUN npm install
+# Create a system user for running Composer and Artisan commands
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
 
-# Copy the rest of the application
-COPY . .
+# Copy Nginx configuration and entrypoint script
+COPY ./docker/default.conf /etc/nginx/sites-enabled/default
+COPY ./docker/entrypoint.sh /etc/entrypoint.sh
 
-# Make port 80 available to the world outside this container
+# Make the entrypoint script executable
+RUN chmod +x /etc/entrypoint.sh
+
+# Set the working directory
+WORKDIR /var/www
+
+# Copy the application code
+COPY --chown=www-data:www-data .. /var/www
+
+# Install PHP dependencies
+RUN composer install
+
+# Expose port 80
 EXPOSE 80
 
-CMD ["node", "./app.js"]
+# Define the entrypoint
+ENTRYPOINT ["/etc/entrypoint.sh"]
