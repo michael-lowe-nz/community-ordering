@@ -1,16 +1,24 @@
 import { Construct } from 'constructs';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { aws_ec2 as ec2, aws_iam as iam } from 'aws-cdk-lib';
+import { FckNatInstanceProvider } from 'cdk-fck-nat';
+import { Peer, Port } from 'aws-cdk-lib/aws-ec2';
 
-export class SingleAzVpcWithNat extends Construct {
+export class HobbyVPC extends Construct {
     public readonly vpc: ec2.Vpc;
-    public readonly natInstance: ec2.Instance;
+    public readonly natInstance: FckNatInstanceProvider;
+    public readonly testInstance: ec2.Instance;
 
     constructor(scope: Construct, id: string) {
         super(scope, id);
 
+        // Create NAT instance using cdk-fck-nat
+        this.natInstance = new FckNatInstanceProvider({
+            instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.NANO),
+        });
+
         // Create the VPC with 1 AZ, 1 public subnet, and 1 private subnet
         this.vpc = new ec2.Vpc(this, 'VPC', {
-            maxAzs: 1,
+            maxAzs: 2,
             subnetConfiguration: [
                 {
                     name: 'Public',
@@ -23,50 +31,81 @@ export class SingleAzVpcWithNat extends Construct {
                     cidrMask: 24,
                 },
             ],
-            natGateways: 0, // We don't want a NAT Gateway since we're using a NAT Instance
+            natGatewayProvider: this.natInstance,
         });
 
-        // Create security group for NAT instance
-        const natSecurityGroup = new ec2.SecurityGroup(this, 'NatSecurityGroup', {
+        this.natInstance.securityGroup.addIngressRule(Peer.ipv4(this.vpc.vpcCidrBlock), Port.allTraffic());
+
+
+        // Create security group for EC2 Instance Connect Endpoint
+        const eicSecurityGroup = new ec2.SecurityGroup(this, 'EC2InstanceConnectSecurityGroup', {
             vpc: this.vpc,
-            description: 'Security group for NAT Instance',
+            description: 'Security group for EC2 Instance Connect Endpoint',
             allowAllOutbound: true,
         });
 
-        // Allow inbound HTTP/HTTPS traffic from private subnet
-        natSecurityGroup.addIngressRule(
-            ec2.Peer.ipv4(this.vpc.privateSubnets[0].ipv4CidrBlock),
-            ec2.Port.tcp(80),
-            'Allow HTTP from private subnet'
-        );
-        natSecurityGroup.addIngressRule(
-            ec2.Peer.ipv4(this.vpc.privateSubnets[0].ipv4CidrBlock),
-            ec2.Port.tcp(443),
-            'Allow HTTPS from private subnet'
+        // Create EC2 Instance Connect Endpoint
+        new ec2.CfnInstanceConnectEndpoint(this, 'EC2InstanceConnectEndpoint', {
+            subnetId: this.vpc.privateSubnets[0].subnetId,
+            securityGroupIds: [eicSecurityGroup.securityGroupId],
+        });
+
+        // Create security group for test instance
+        const testSecurityGroup = new ec2.SecurityGroup(this, 'TestSecurityGroup', {
+            vpc: this.vpc,
+            description: 'Security group for test instance',
+            allowAllOutbound: true,
+        });
+
+        // Allow SSH access from the EC2 Instance Connect Endpoint using L2 construct
+        testSecurityGroup.addIngressRule(
+            ec2.SecurityGroup.fromSecurityGroupId(this, 'EICSecurityGroupReference', eicSecurityGroup.securityGroupId),
+            ec2.Port.tcp(22),
+            'Allow SSH from EC2 Instance Connect Endpoint'
         );
 
-        // Create NAT instance
-        this.natInstance = new ec2.Instance(this, 'NatInstance', {
+        // Create test instance with connectivity test script
+        const testUserData = ec2.UserData.forLinux();
+        testUserData.addCommands(
+            'yum update -y',
+            'yum install -y amazon-cloudwatch-agent curl',
+
+            // Create a test script
+            'cat << EOF > /home/ec2-user/test-connectivity.sh',
+            '#!/bin/bash',
+            'echo "Testing connectivity..."',
+            'curl -s --max-time 5 http://checkip.amazonaws.com || echo "Failed to reach internet"',
+            'echo "Testing DNS resolution..."',
+            'nslookup amazon.com || echo "Failed to resolve DNS"',
+            'EOF',
+
+            'chmod +x /home/ec2-user/test-connectivity.sh',
+
+            // Run the test immediately and save to a log file
+            '/home/ec2-user/test-connectivity.sh > /home/ec2-user/connectivity-test.log 2>&1'
+        );
+
+        this.testInstance = new ec2.Instance(this, 'TestInstance', {
             vpc: this.vpc,
             vpcSubnets: {
-                subnetType: ec2.SubnetType.PUBLIC,
+                subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
             },
             instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.NANO),
             machineImage: new ec2.AmazonLinuxImage({
                 generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
                 cpuType: ec2.AmazonLinuxCpuType.X86_64,
             }),
-            securityGroup: natSecurityGroup,
-            sourceDestCheck: false, // Required for NAT instance
+            securityGroup: testSecurityGroup,
+            userData: testUserData,
+            requireImdsv2: true,
         });
 
-        // Add route from private subnet to NAT instance
-        const privateRouteTable = this.vpc.privateSubnets[0].routeTable;
+        /// Add the SSMManagedCore policy to the instance role
+        this.testInstance.role.addManagedPolicy(
+            iam.ManagedPolicy.fromAwsManagedPolicyName('EC2InstanceConnect')
+        );
 
-        new ec2.CfnRoute(this, 'NatRoute', {
-            routeTableId: privateRouteTable.routeTableId,
-            destinationCidrBlock: '0.0.0.0/0',
-            instanceId: this.natInstance.instanceId,
-        });
+        // An event bridge rule that triggers a command to delete the whole VPC every day at 1AM
+
     }
 }

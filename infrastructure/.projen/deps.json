@@ -76,6 +76,11 @@
       "type": "runtime"
     },
     {
+      "name": "cdk-fck-nat",
+      "version": "1.5.13",
+      "type": "runtime"
+    },
+    {
       "name": "constructs",
       "version": "^10.0.5",
       "type": "runtime"

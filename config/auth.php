@@ -15,6 +15,7 @@ return [
 
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
+        // amazonq-ignore-next-line
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 

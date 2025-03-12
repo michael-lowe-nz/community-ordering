@@ -3,8 +3,15 @@
 # Start Nginx service
 service nginx start
 
+# Generate application key if not already set
+if [ -z "$APP_KEY" ]; then
+    php artisan key:generate --force
+fi
+
 # Run Laravel migrations
-php artisan migrate --force
+# php artisan migrate --force
+# For now we do this every deploy
+php artisan migrate:refresh --seed --force
 
 # Create symbolic link for storage
 php artisan storage:link

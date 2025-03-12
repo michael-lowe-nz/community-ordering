@@ -39,6 +39,7 @@ RUN chmod +x /etc/entrypoint.sh
 
 # Set the working directory
 WORKDIR /var/www
+# USER www-data
 
 # Copy the application code
 COPY --chown=www-data:www-data .. /var/www
