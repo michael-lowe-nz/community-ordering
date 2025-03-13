@@ -1,6 +1,7 @@
 import {
   App, aws_ecs,
   aws_ecs_patterns,
+  aws_iam,
   aws_secretsmanager,
   Duration,
   Stack, StackProps
@@ -8,6 +9,7 @@ import {
 import { Construct } from 'constructs';
 import path from 'path';
 import { HobbyVPC } from './constructs/hobbyVPC';
+import { GitHubActionRole } from "cdk-pipelines-github";
 
 export class ApplicationStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
@@ -54,6 +56,26 @@ export class ApplicationStack extends Stack {
   }
 }
 
+export class SupportStack extends Stack {
+  constructor(scope: Construct, id: string, props: StackProps = {}) {
+    super(scope, id, props);
+
+
+    const githubProvider =
+      aws_iam.OpenIdConnectProvider.fromOpenIdConnectProviderArn(
+        this,
+        "OpenIdConnectProvider",
+        `arn:aws:iam::${this.account}:oidc-provider/token.actions.githubusercontent.com`
+      );
+
+    new GitHubActionRole(this, "Deployment", {
+      repos: ["michael-lowe-nz/scrape-and-text-remind"],
+      provider: githubProvider,
+      roleName: "community-ordering-deployment-role",
+    });
+  }
+}
+
 // for development, use account/region from cdk cli
 const devEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -62,7 +84,10 @@ const devEnv = {
 
 const app = new App();
 
-new ApplicationStack(app, 'laravel-starter-dev', { env: devEnv });
-// new MyStack(app, 'laravel-starter-prod', { env: prodEnv });
+new ApplicationStack(app, 'CommunityOrdering-Application', { env: devEnv });
+
+if (!process.env.CI) {
+new SupportStack(app, 'CommunityOrdering-Support', { env: devEnv });
+}
 
 app.synth();

@@ -4,5 +4,8 @@
     "ap-southeast-2b",
     "ap-southeast-2c"
   ],
-  "ami:account=476203294330:filters.image-type.0=machine:filters.name.0=fck-nat-al2023-*-arm64-ebs:filters.state.0=available:owners.0=568608671756:region=ap-southeast-2": "ami-0799b4d92d35edd4a"
+  "ami:account=476203294330:filters.image-type.0=machine:filters.name.0=fck-nat-al2023-*-arm64-ebs:filters.state.0=available:owners.0=568608671756:region=ap-southeast-2": "ami-0799b4d92d35edd4a",
+  "acknowledged-issue-numbers": [
+    32775
+  ]
 }

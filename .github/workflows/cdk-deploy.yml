@@ -1,0 +1,51 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+     - main
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: 'ap-southeast-2'
+  AWS_ROLE_DURATION_SECONDS: 1800
+  AWS_ROLE_SKIP_SESSION_TAGGING: true
+  NODE_CACHE_NAME: 'npm'
+  NODE_VERSION: 22
+
+jobs:
+  dev-cdk-deploy:
+    name: Prod
+    runs-on: ubuntu-latest
+    env: 
+      CDK_DEPLOY_PATH: "*"
+      AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: ${{ env.NODE_CACHE_NAME }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: ${{ env.AWS_ROLE_DURATION_SECONDS }}
+          role-skip-session-tagging: ${{ env.AWS_ROLE_SKIP_SESSION_TAGGING }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/community-ordering-deployment-role
+
+      - name: Install CDK dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: CDK synth and deploy
+        run: |
+          npx cdk synth
+          npx cdk deploy --require-approval never --concurrency 5 $CDK_DEPLOY_PATH

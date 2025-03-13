@@ -1,0 +1,22 @@
+digraph INFRA {
+  node [ color = "black", fillcolor = "#E6E6E6", height =1, style = "filled,bold,rounded", fontname = "Arial" ];
+  "Network" [ label = "Network
+(HobbyVPC)", shape =rectangle ];
+  "Cluster" [ label = "Cluster
+(AWS::ECS::Cluster)", shape =rectangle, fillcolor = "#B7E0FF" ];
+  "GooglePlacesAPIKey" [ label = "GooglePlacesAPIKey
+(AWS::SecretsManager::Secret)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "Laravel" [ label = "Laravel
+(AWS::ECS::Service)", shape =rectangle, fillcolor = "#B7E0FF" ];
+  "LaravelTaskDefinition" [ label = "LaravelTaskDefinition
+(AWS::ECS::TaskDefinition)", shape =rectangle, fillcolor = "#B7E0FF" ];
+  "LaravelLoadBalancer" [ label = "LaravelLoadBalancer
+(AWS::ElasticLoadBalancingV2::LoadBalancer)", shape =rectangle, fillcolor = "#E78F81" ];
+  "LaravelLogGroup" [ label = "LaravelLogGroup
+(AWS::Logs::LogGroup)", shape =rectangle ];
+  "Cluster" -> "Network";
+  "Laravel" -> "Cluster";
+  "Laravel" -> "GooglePlacesAPIKey";
+  "LaravelTaskDefinition" -> "GooglePlacesAPIKey";
+  "LaravelLoadBalancer" -> "Network";
+}
