@@ -21,6 +21,9 @@ jobs:
   dev-cdk-deploy:
     name: Prod
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
     env: 
       CDK_DEPLOY_PATH: "*"
       AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID}}
