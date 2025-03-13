@@ -30,12 +30,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
+        
       - name: Configure Node.js
         uses: actions/setup-node@v4
         with:
           cache: ${{ env.NODE_CACHE_NAME }}
           node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: infrastructure/yarn.lock
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
