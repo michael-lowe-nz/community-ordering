@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./app
+        working-directory: ./intrastructure
     env: 
       CDK_DEPLOY_PATH: "*"
       AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID}}
