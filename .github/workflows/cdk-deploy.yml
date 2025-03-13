@@ -16,14 +16,14 @@ env:
   AWS_ROLE_SKIP_SESSION_TAGGING: true
   NODE_CACHE_NAME: 'npm'
   NODE_VERSION: 22
+defaults:
+  run:
+    working-directory: infrastructure
 
 jobs:
   dev-cdk-deploy:
     name: Prod
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: infrastructure
     env: 
       CDK_DEPLOY_PATH: "*"
       AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID}}
