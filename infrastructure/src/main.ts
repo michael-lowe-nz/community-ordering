@@ -56,6 +56,25 @@ export class ApplicationStack extends Stack {
   }
 }
 
+export class OIDCStack extends Stack {
+  constructor(scope: Construct, id: string, props: StackProps = {}) {
+    super(scope, id, props);
+
+    new aws_iam.OpenIdConnectProvider(
+      this,
+      "GithubOIDCProvider",
+      {
+        url: "https://token.actions.githubusercontent.com",
+        clientIds: ["sts.amazonaws.com"],
+        thumbprints: [
+          "6938fd4d98bab03faadb97b34396831e3780aea1",
+          "1c58a3a8518e8759bf075b76b750d4f2df264fcd",
+        ],
+      }
+    );
+  }
+}
+
 export class SupportStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
@@ -69,7 +88,7 @@ export class SupportStack extends Stack {
       );
 
     new GitHubActionRole(this, "Deployment", {
-      repos: ["michael-lowe-nz/scrape-and-text-remind"],
+      repos: ["michael-lowe-nz/community-ordering"],
       provider: githubProvider,
       roleName: "community-ordering-deployment-role",
     });
@@ -87,7 +106,8 @@ const app = new App();
 new ApplicationStack(app, 'CommunityOrdering-Application', { env: devEnv });
 
 if (!process.env.CI) {
-new SupportStack(app, 'CommunityOrdering-Support', { env: devEnv });
+  new SupportStack(app, 'CommunityOrdering-Support', { env: devEnv });
+  new OIDCStack(app, 'OIDC', { env: devEnv });
 }
 
 app.synth();
