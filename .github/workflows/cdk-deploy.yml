@@ -23,9 +23,8 @@ defaults:
 jobs:
   dev-cdk-deploy:
     name: Prod
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     env: 
-      CDK_DEPLOY_PATH: "*"
       AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID}}
     steps:
       - name: Checkout repo
@@ -52,4 +51,4 @@ jobs:
       - name: CDK synth and deploy
         run: |
           npx cdk synth
-          npx cdk deploy --require-approval never --concurrency 5 $CDK_DEPLOY_PATH
+          npx cdk deploy --require-approval never --concurrency 5 --all
