@@ -25,12 +25,12 @@ export class ApplicationStack extends Stack {
 
     const ecsTask = new aws_ecs_patterns.ApplicationLoadBalancedFargateService(this, 'Laravel', {
       cluster: cluster,
-
       taskImageOptions: {
         image: aws_ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         environment: {
           "APP_DEBUG": "true",
           "APP_KEY": "base64:DxoxkrxQSnbiAy2HFg2Q3lZP7TPOj6ZO/Ipajr5UvGk=",
+          "LOG_CHANNEL": "stderr",
         },
         secrets: {
           "GOOGLE_PLACES_API_KEY": aws_ecs.Secret.fromSecretsManager(googleAPIKey),},
@@ -49,7 +49,8 @@ export class ApplicationStack extends Stack {
       healthCheckGracePeriod: Duration.seconds(60),  // Give containers time to start up
       healthCheck: {
         command: ["php artisan db:monitor"],
-      }
+      },
+      
     });
 
     googleAPIKey.grantRead(ecsTask.taskDefinition.taskRole);
