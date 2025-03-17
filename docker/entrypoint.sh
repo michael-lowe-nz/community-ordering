@@ -8,6 +8,11 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
+# Setup SQLlite DB
+touch /var/www/database/database.sqlite
+chmod 777 /var/www/database/database.sqlite
+chown -R www-data:www-data /var/www/database
+
 # Run Laravel migrations
 # php artisan migrate --force
 # For now we do this every deploy
