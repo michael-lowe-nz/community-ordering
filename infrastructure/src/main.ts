@@ -1,5 +1,5 @@
 import {
-  App, aws_ecs,
+  App, aws_ec2, aws_ecs,
   aws_ecs_patterns,
   aws_iam,
   aws_secretsmanager,
@@ -11,20 +11,34 @@ import path from 'path';
 import { HobbyVPC } from './constructs/hobbyVPC';
 import { GitHubActionRole } from "cdk-pipelines-github";
 
-export class ApplicationStack extends Stack {
+export class NetworkStack extends Stack {
+  cluster: aws_ecs.Cluster;
+  vpc: aws_ec2.Vpc;
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
 
-    const network = new HobbyVPC(this, 'Network');
-
-    const cluster = new aws_ecs.Cluster(this, 'Cluster', {
-      vpc: network.vpc,
+    this.vpc = new HobbyVPC(this, 'Network').vpc;
+    
+    this.cluster = new aws_ecs.Cluster(this, 'Cluster', {
+      vpc: this.vpc,
     });
+  }
+}
+
+interface ApplicationStackProps extends StackProps {
+  vpc: aws_ec2.Vpc;
+  cluster: aws_ecs.Cluster;
+}
+
+export class ApplicationStack extends Stack {
+  constructor(scope: Construct, id: string, props: ApplicationStackProps) {
+    super(scope, id, props);
+
 
     const googleAPIKey = aws_secretsmanager.Secret.fromSecretNameV2(this, 'GooglePlacesAPIKey', 'GooglePlacesAPIKey');
 
     const ecsTask = new aws_ecs_patterns.ApplicationLoadBalancedFargateService(this, 'Laravel', {
-      cluster: cluster,
+      cluster: props.cluster,
       taskImageOptions: {
         image: aws_ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         environment: {
@@ -104,9 +118,10 @@ const devEnv = {
 
 const app = new App();
 
-new ApplicationStack(app, 'CommunityOrdering-Application', { env: devEnv });
+const networkStack = new NetworkStack(app, 'CommunityOrdering-Network', { env: devEnv });
+new ApplicationStack(app, 'CommunityOrdering-Application', { env: devEnv, vpc: networkStack.vpc, cluster: networkStack.cluster });
 
-if (!process.env.CI) {
+if (process.env.SETUP_ONLY) {
   new SupportStack(app, 'CommunityOrdering-Support', { env: devEnv });
   new OIDCStack(app, 'OIDC', { env: devEnv });
 }
