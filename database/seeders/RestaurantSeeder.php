@@ -17,6 +17,9 @@ class RestaurantSeeder extends Seeder
      */
     public function run()
     {
+        // First delete all restaurants from the database
+        DB::table('restaurants')->delete();
+        
         $apiKey = env('GOOGLE_PLACES_API_KEY');
         
         if (!$apiKey) {
