@@ -4,7 +4,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   defaultReleaseBranch: 'main',
   name: 'laravel-starter',
   projenrcTs: true,
-
   deps: [
     'cdk-fck-nat@1.5.13', 
     'cdk-pipelines-github',
