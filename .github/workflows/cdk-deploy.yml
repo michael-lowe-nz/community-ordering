@@ -48,6 +48,12 @@ jobs:
       - name: Install CDK dependencies
         run: yarn install --frozen-lockfile
 
+      # Move up a direcotry and run npm run build
+      - name: Build Laravel Frontend
+        run: |
+          cd ..
+          npm run build
+
       - name: CDK synth and deploy
         run: |
           npx cdk synth

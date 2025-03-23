@@ -1,7 +1,11 @@
 import {
-  App, aws_ec2, aws_ecs,
+  App, aws_certificatemanager, aws_ec2, aws_ecs,
   aws_ecs_patterns,
+  aws_elasticloadbalancingv2,
+  // aws_efs,
   aws_iam,
+  aws_route53,
+  aws_route53_targets,
   aws_secretsmanager,
   Duration,
   Stack, StackProps
@@ -34,11 +38,30 @@ export class ApplicationStack extends Stack {
   constructor(scope: Construct, id: string, props: ApplicationStackProps) {
     super(scope, id, props);
 
+    // Add a hosted zone for orderfood.site
+    const hostedZone = new aws_route53.HostedZone(this, 'HostedZone', {
+      zoneName: 'orderfood.site',
+    });
+
+    // Create an ACM certificate for the domain
+    const certificate = new aws_certificatemanager.Certificate(this, 'Certificate', {
+      domainName: 'orderfood.site',
+      validation: aws_certificatemanager.CertificateValidation.fromDns(hostedZone),
+    });
 
     const googleAPIKey = aws_secretsmanager.Secret.fromSecretNameV2(this, 'GooglePlacesAPIKey', 'GooglePlacesAPIKey');
 
     const ecsTask = new aws_ecs_patterns.ApplicationLoadBalancedFargateService(this, 'Laravel', {
       cluster: props.cluster,
+      circuitBreaker: { rollback: true },
+      minHealthyPercent: 0,
+      maxHealthyPercent: 100,
+      certificate,
+      // sslPolicy: Ssl.RECOMMENDED,
+      domainName: 'orderfood.site',
+      domainZone: hostedZone,
+      redirectHTTP: true,
+      protocol: aws_elasticloadbalancingv2.ApplicationProtocol.HTTPS,
       taskImageOptions: {
         image: aws_ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         environment: {
@@ -64,10 +87,25 @@ export class ApplicationStack extends Stack {
       healthCheck: {
         command: ["php artisan db:monitor"],
       },
-      
+    });
+
+    // Create DNS records for the load balancer
+    new aws_route53.ARecord(this, 'AliasRecord', {
+      zone: hostedZone,
+      target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.LoadBalancerTarget(ecsTask.loadBalancer)),
+      recordName: 'orderfood.site',
     });
 
     googleAPIKey.grantRead(ecsTask.taskDefinition.taskRole);
+
+    ecsTask.targetGroup.configureHealthCheck({
+      path: '/health-check',
+      interval: Duration.seconds(60),
+      healthyThresholdCount: 2,
+      unhealthyThresholdCount: 5,
+      timeout: Duration.seconds(30),
+    })
+
   }
 }
 

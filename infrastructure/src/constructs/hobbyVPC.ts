@@ -98,6 +98,7 @@ export class HobbyVPC extends Construct {
             securityGroup: testSecurityGroup,
             userData: testUserData,
             requireImdsv2: true,
+            instanceName: `${this.node.path}-test-instance`,
         });
 
         /// Add the SSMManagedCore policy to the instance role
