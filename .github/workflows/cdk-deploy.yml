@@ -52,7 +52,7 @@ jobs:
       - name: Build Laravel Frontend
         run: |
           cd ..
-          yarn --frozen-lockfile && npm run build
+          npm ci && npm run build
 
       - name: CDK synth and deploy
         run: |
