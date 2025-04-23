@@ -1,60 +1,60 @@
-name: Deploy
+# name: Deploy
 
-on:
-  push:
-    branches:
-     - main
-  workflow_dispatch: {}
+# on:
+#   push:
+#     branches:
+#      - main
+#   workflow_dispatch: {}
 
-permissions:
-  contents: read
-  id-token: write
+# permissions:
+#   contents: read
+#   id-token: write
 
-env:
-  AWS_REGION: 'ap-southeast-2'
-  AWS_ROLE_DURATION_SECONDS: 1800
-  AWS_ROLE_SKIP_SESSION_TAGGING: true
-  NODE_CACHE_NAME: 'npm'
-  NODE_VERSION: 22
-defaults:
-  run:
-    working-directory: infrastructure
+# env:
+#   AWS_REGION: 'ap-southeast-2'
+#   AWS_ROLE_DURATION_SECONDS: 1800
+#   AWS_ROLE_SKIP_SESSION_TAGGING: true
+#   NODE_CACHE_NAME: 'npm'
+#   NODE_VERSION: 22
+# defaults:
+#   run:
+#     working-directory: infrastructure
 
-jobs:
-  dev-cdk-deploy:
-    name: Prod
-    runs-on: ubuntu-24.04-arm
-    env: 
-      AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID}}
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+# jobs:
+#   dev-cdk-deploy:
+#     name: Prod
+#     runs-on: ubuntu-24.04-arm
+#     env: 
+#       AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT_ID}}
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v4
         
-      - name: Configure Node.js
-        uses: actions/setup-node@v4
-        with:
-          cache: ${{ env.NODE_CACHE_NAME }}
-          node-version: ${{ env.NODE_VERSION }}
-          cache-dependency-path: infrastructure/yarn.lock
+#       - name: Configure Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           cache: ${{ env.NODE_CACHE_NAME }}
+#           node-version: ${{ env.NODE_VERSION }}
+#           cache-dependency-path: infrastructure/yarn.lock
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          role-duration-seconds: ${{ env.AWS_ROLE_DURATION_SECONDS }}
-          role-skip-session-tagging: ${{ env.AWS_ROLE_SKIP_SESSION_TAGGING }}
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/community-ordering-deployment-role
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-region: ${{ env.AWS_REGION }}
+#           role-duration-seconds: ${{ env.AWS_ROLE_DURATION_SECONDS }}
+#           role-skip-session-tagging: ${{ env.AWS_ROLE_SKIP_SESSION_TAGGING }}
+#           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/community-ordering-deployment-role
 
-      - name: Install CDK dependencies
-        run: yarn install --frozen-lockfile
+#       - name: Install CDK dependencies
+#         run: yarn install --frozen-lockfile
 
-      # Move up a direcotry and run npm run build
-      - name: Build Laravel Frontend
-        run: |
-          cd ..
-          npm ci && npm run build
+#       # Move up a direcotry and run npm run build
+#       - name: Build Laravel Frontend
+#         run: |
+#           cd ..
+#           npm ci && npm run build
 
-      - name: CDK synth and deploy
-        run: |
-          npx cdk synth
-          npx cdk deploy --require-approval never --concurrency 5 --all
+#       - name: CDK synth and deploy
+#         run: |
+#           npx cdk synth
+#           npx cdk deploy --require-approval never --concurrency 5 --all
