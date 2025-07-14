@@ -13,6 +13,8 @@ class Restaurant extends Model
         'cuisine_type',
         'price_range',
         'opening_hours',
-        'description'
+        'description',
+        'google_place_id',
+        'rating',
     ];
 }
