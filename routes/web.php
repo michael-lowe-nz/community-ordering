@@ -19,6 +19,14 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
+        if (auth()->user()->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
         return view('dashboard');
     })->name('dashboard');
+    
+    Route::middleware('admin')->group(function () {
+        Route::get('/admin/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::post('/admin/add-restaurants', [App\Http\Controllers\AdminController::class, 'addRestaurantsFromLocation'])->name('admin.add-restaurants');
+    });
 });
