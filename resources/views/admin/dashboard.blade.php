@@ -26,6 +26,32 @@
                                 <p class="mt-2">Restaurants added: <strong>{{ session('addedCount') }}</strong></p>
                                 <p>New total: <strong>{{ session('totalRestaurants') }}</strong></p>
                             @endif
+                            
+                            @if(session('addedRestaurants') && count(session('addedRestaurants')) > 0)
+                                <div class="mt-4">
+                                    <p class="font-semibold mb-2">Added Restaurants:</p>
+                                    <div class="bg-white rounded-lg p-3 max-h-60 overflow-y-auto">
+                                        <ul class="space-y-2">
+                                            @foreach(session('addedRestaurants') as $restaurant)
+                                                <li class="flex items-start justify-between p-2 bg-gray-50 rounded border-l-4 border-green-400">
+                                                    <div class="flex-1">
+                                                        <p class="font-medium text-gray-900">{{ $restaurant['name'] }}</p>
+                                                        <p class="text-sm text-gray-600">📍 {{ Str::limit($restaurant['address'], 50) }}</p>
+                                                        @if($restaurant['rating'])
+                                                            <p class="text-sm text-gray-600">⭐ {{ $restaurant['rating'] }}/5</p>
+                                                        @endif
+                                                    </div>
+                                                    <div class="ml-2">
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                            New
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @endif
 
