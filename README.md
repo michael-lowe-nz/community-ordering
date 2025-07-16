@@ -1,118 +1,128 @@
-# Laravel Restaurant Directory: A Modern Web Application for Restaurant Management and Discovery
+# Laravel Restaurant Directory
 
-Laravel Restaurant Directory is a robust web application that helps users discover and manage restaurant information. The application provides a comprehensive platform for storing, displaying, and managing restaurant details including locations, menus, and business information, with integration to Google Places API for enhanced data accuracy.
+A modern Laravel 12.0 application for restaurant management and discovery, built with Jetstream, Livewire, and Tailwind CSS. This project provides a comprehensive platform for managing restaurant information with a focus on developer experience and production-ready deployment.
 
-The application is built using Laravel 12.0, featuring a modern tech stack that includes Tailwind CSS for styling, Docker for containerization, and AWS CDK for infrastructure deployment. It offers a RESTful API for restaurant data management, real-time search capabilities, and a responsive web interface. The application supports both local development with Docker Compose and production deployment to AWS using ECS Fargate, making it suitable for both development and production environments.
+## Tech Stack
 
-## Repository Structure
-```
-.
-├── app/                          # Core application code
-│   ├── Http/Controllers/         # Request handlers for restaurants and menu items
-│   └── Models/                   # Eloquent models for Restaurant and MenuItem
-├── bootstrap/                    # Application bootstrapping files
-├── config/                      # Configuration files for auth, cache, database, etc.
-├── database/                    # Database migrations, seeders, and factories
-├── docker/                      # Docker configuration files
-├── infrastructure/              # AWS CDK infrastructure code
-│   └── src/                    # TypeScript source for AWS infrastructure
-├── resources/                   # Frontend assets and views
-│   ├── css/                    # Stylesheets including Tailwind CSS
-│   ├── js/                     # JavaScript files
-│   └── views/                  # Blade template files
-├── routes/                     # Application routes
-└── tests/                     # Test files for Feature and Unit tests
-```
+- **Backend**: Laravel 12.0 with PHP 8.2+
+- **Frontend**: Livewire 3.0, Tailwind CSS 3.4, Vite 6.0
+- **Authentication**: Laravel Jetstream with Sanctum
+- **Database**: MySQL 8.0
+- **Development**: Laravel Sail, Docker Compose
+- **Testing**: PHPUnit 11.5
+- **Code Quality**: Laravel Pint
 
-## Usage Instructions
-### Prerequisites
+## Prerequisites
+
 - PHP 8.2 or higher
 - Composer 2.x
 - Node.js 16.x or higher
 - Docker and Docker Compose
-- AWS CLI (for deployment)
-- Google Places API key
-- Visual Studio Code (recommended for development)
+- Visual Studio Code (recommended)
 
-### Installation
+## Development Workflow
 
-1. Clone the repository:
+### Quick Setup with Laravel Sail
+
+1. **Clone and setup**:
 ```bash
 git clone <repository-url>
 cd laravel-restaurant-directory
-```
-
-2. Install PHP dependencies:
-```bash
-composer install
-```
-
-3. Install Node.js dependencies:
-```bash
-npm install
-```
-
-4. Set up environment variables:
-```bash
 cp .env.example .env
-php artisan key:generate
 ```
 
-5. Start the Docker environment:
+2. **Start development environment**:
 ```bash
+# Start all services (Laravel, MySQL, Mailpit)
+./vendor/bin/sail up -d
+
+# Or use Docker Compose directly
 docker-compose up -d
 ```
 
-6. Run database migrations and seeders:
+3. **Install dependencies and setup database**:
 ```bash
-docker-compose exec laravel.test php artisan migrate
-docker-compose exec laravel.test php artisan db:seed
+# Install PHP dependencies
+./vendor/bin/sail composer install
+
+# Install Node dependencies
+./vendor/bin/sail npm install
+
+# Generate application key
+./vendor/bin/sail artisan key:generate
+
+# Run migrations
+./vendor/bin/sail artisan migrate
+
+# Seed database (if seeders exist)
+./vendor/bin/sail artisan db:seed
 ```
 
-### Development with VSCode Dev Containers
+4. **Start development server**:
+```bash
+# Start the full development stack (server, queue, logs, vite)
+./vendor/bin/sail composer dev
 
-For the best development experience, you can use Visual Studio Code with the Dev Containers extension:
+# Or start individual services
+./vendor/bin/sail artisan serve  # Laravel server
+./vendor/bin/sail npm run dev    # Vite dev server
+```
 
-1. Install the "Remote - Containers" extension in VSCode:
-   - Open VSCode
-   - Press `Ctrl+P` (Windows/Linux) or `Cmd+P` (macOS)
-   - Type `ext install ms-vscode-remote.remote-containers`
+### Alternative Development Options
 
-2. Open the project in a dev container:
-   - Open the project folder in VSCode
-   - Click the green button in the lower-left corner or press `F1`
-   - Select "Remote-Containers: Reopen in Container"
-   - VSCode will build and start the development container
+#### VSCode Dev Containers
+The project includes a `.devcontainer` configuration for seamless development:
 
-3. The dev container provides:
-   - Pre-configured PHP development environment
-   - Debug configuration
-   - Extension recommendations
-   - Integrated terminal with all required tools
+1. **Setup**:
+   - Install the "Dev Containers" extension in VSCode
+   - Open project folder and select "Reopen in Container"
+   - Container automatically extends the existing Docker Compose setup
+
+2. **Features**:
+   - Pre-configured development environment
+   - Integrated terminal with Laravel Sail
    - Automatic port forwarding
+   - Works with existing `docker-compose.yml`
 
-4. Once the container is running, you can:
-   - Use the integrated terminal to run artisan commands
-   - Debug your application with Xdebug
-   - Access the application at `http://localhost`
-   - Make changes to the code with full IDE support
+#### AWS Cloud9 / CodeCatalyst
+For cloud-based development, use the included `devfile.yaml`:
 
-### Quick Start
-1. Access the application:
 ```bash
-# Local development
-http://localhost:80
+# Install dependencies
+composer install && npm install
+
+# Build assets
+npm run build
+
+# Run tests
+php artisan test
 ```
 
-2. View restaurant listings:
+## Common Development Tasks
+
+### Daily Development Commands
+
 ```bash
-http://localhost/restaurant
+# Start development environment
+./vendor/bin/sail up -d
+
+# Run the full development stack (recommended)
+./vendor/bin/sail composer dev
+# This runs: server + queue + logs + vite concurrently
+
+# Individual commands
+./vendor/bin/sail artisan serve          # Laravel development server
+./vendor/bin/sail npm run dev           # Vite development server
+./vendor/bin/sail artisan queue:listen  # Queue worker
+./vendor/bin/sail artisan pail          # Real-time logs
 ```
 
-3. View individual restaurant details:
-```bash
-http://localhost/restaurant/{id}
-```
+### Accessing Services
+
+- **Application**: http://localhost (port 80)
+- **Vite Dev Server**: http://localhost:5173
+- **Mailpit (Email testing)**: http://localhost:8025
+- **MySQL**: localhost:3306
 
 ### More Detailed Examples
 
