@@ -68,8 +68,8 @@ class ScrapingLog extends Model
     {
         return [
             'restaurant_id' => 'required|exists:restaurants,id',
-            'scraping_type' => 'required|in:menu,full',
-            'status' => 'required|in:success,failed,partial',
+            'scraping_type' => 'required|in:manual,scheduled',
+            'status' => 'required|in:success,failed,partial,in_progress',
             'items_found' => 'nullable|integer|min:0',
             'items_created' => 'nullable|integer|min:0',
             'items_updated' => 'nullable|integer|min:0',

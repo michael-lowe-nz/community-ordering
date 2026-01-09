@@ -120,6 +120,67 @@
                     </div>
                     @endif
                 </div>
+                
+                <!-- Menu Display Section -->
+                <div class="mt-12">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-6">Menu</h2>
+                    
+                    @if($activeMenus->isEmpty())
+                        <div class="bg-gray-50 rounded-lg p-6 text-center">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <p class="text-gray-600">No menu information is currently available for this restaurant.</p>
+                        </div>
+                    @else
+                        @foreach($activeMenus as $menu)
+                            @if($menu->menuItems->isNotEmpty())
+                                <div class="mb-8">
+                                    @if(count($activeMenus) > 1)
+                                        <h3 class="text-xl font-medium text-gray-800 mb-4">{{ $menu->name }}</h3>
+                                    @endif
+                                    
+                                    @if(isset($menuSections[$menu->id]) && $menuSections[$menu->id]->isNotEmpty())
+                                        @foreach($menuSections[$menu->id] as $section => $items)
+                                            <div class="mb-8">
+                                                <h4 class="text-lg font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                                                    {{ $section ?: 'Other Items' }}
+                                                </h4>
+                                                
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    @foreach($items as $item)
+                                                        <div class="bg-white rounded-lg p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
+                                                            <div class="flex justify-between items-start">
+                                                                <h5 class="text-base font-semibold text-gray-900">{{ $item->name }}</h5>
+                                                                @if($item->hasPrice())
+                                                                    <span class="text-orange-600 font-medium">${{ number_format($item->price, 2) }}</span>
+                                                                @endif
+                                                            </div>
+                                                            
+                                                            @if($item->description)
+                                                                <p class="mt-2 text-sm text-gray-600">{{ $item->description }}</p>
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="bg-gray-50 rounded-lg p-6 text-center">
+                                            <p class="text-gray-600">No menu items available in this menu.</p>
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="mt-4 text-xs text-gray-500 text-right">
+                                        @if($menu->scraped_at)
+                                            <p>Menu last updated: {{ $menu->scraped_at->format('F j, Y') }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
+                    @endif
+                </div>
             </div>
         </div>
     </div>

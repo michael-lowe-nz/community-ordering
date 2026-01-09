@@ -23,7 +23,7 @@
   - Write unit tests for HTTP handling and rate limiting behavior
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 4. Implement PDF parsing capabilities
+- [x] 4. Implement PDF parsing capabilities
   - Install and configure PDF text extraction library (e.g., spatie/pdf-to-text)
   - Create PdfParsingService for extracting text from PDF files
   - Implement menu structure detection from extracted PDF text
@@ -31,7 +31,7 @@
   - Write unit tests for PDF parsing with sample menu PDFs
   - _Requirements: 1.1, 1.3, 2.3_
 
-- [ ] 5. Create menu parsing service for content extraction
+- [x] 5. Create menu parsing service for content extraction
   - Implement MenuParsingService with support for HTML and PDF content
   - Create site-specific parsers for common restaurant website formats
   - Add menu item extraction logic for name, description, price, and section
@@ -39,7 +39,7 @@
   - Write unit tests with HTML and PDF fixtures for various restaurant formats
   - _Requirements: 1.3, 2.1, 2.2, 2.3_
 
-- [ ] 6. Build menu storage service for database operations
+- [x] 6. Build menu storage service for database operations
   - Create MenuStorageService for managing Menu and MenuItem database operations
   - Implement menu creation with proper versioning and activation logic
   - Add duplicate detection and update logic for existing menu items
@@ -47,7 +47,7 @@
   - Write unit tests for all storage operations and duplicate handling
   - _Requirements: 1.5, 1.3, 3.5_
 
-- [ ] 7. Implement scraping logging and monitoring service
+- [x] 7. Implement scraping logging and monitoring service
   - Create ScrapingLogService for tracking all scraping activities
   - Add detailed logging for success, failure, and partial scraping results
   - Implement performance metrics tracking (duration, items found/created/updated)
@@ -55,7 +55,7 @@
   - Write unit tests for logging service with various scraping scenarios
   - _Requirements: 3.1, 3.2, 3.4, 3.5_
 
-- [ ] 8. Create main menu scraping orchestration service
+- [x] 8. Create main menu scraping orchestration service
   - Implement MenuScrapingService that coordinates all scraping components
   - Add single restaurant scraping with complete error handling
   - Implement multiple restaurant scraping with proper rate limiting
@@ -63,7 +63,7 @@
   - Write integration tests for complete scraping workflow
   - _Requirements: 1.1, 1.2, 1.4, 3.3_
 
-- [ ] 9. Build admin controller for manual scraping interface
+- [x] 9. Build admin controller for manual scraping interface
   - Create MenuScrapingController with admin authentication middleware
   - Add manual scraping endpoints for single and multiple restaurants
   - Implement scraping status and history display functionality
@@ -71,7 +71,7 @@
   - Write feature tests for admin scraping interface
   - _Requirements: 1.1, 1.2, 3.3, 6.3_
 
-- [ ] 10. Create scheduled scraping job system
+- [x] 10. Create scheduled scraping job system
   - Implement MenuScrapingJob for Laravel queue system
   - Add restaurant selection logic based on scraping frequency configuration
   - Implement job scheduling with different frequencies per restaurant
@@ -79,7 +79,7 @@
   - Write tests for scheduled job execution and failure handling
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 11. Build user-facing menu display functionality
+- [x] 11. Build user-facing menu display functionality
   - Update restaurant show page to display scraped menu items
   - Implement menu organization by sections with proper ordering
   - Add menu item display with name, description, price, and last updated info

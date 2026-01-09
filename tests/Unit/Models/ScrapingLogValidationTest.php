@@ -23,7 +23,7 @@ class ScrapingLogValidationTest extends TestCase
         
         $this->assertStringContainsString('required', $rules['restaurant_id']);
         $this->assertStringContainsString('exists:restaurants,id', $rules['restaurant_id']);
-        $this->assertStringContainsString('in:menu,full', $rules['scraping_type']);
+        $this->assertStringContainsString('in:manual,scheduled', $rules['scraping_type']);
         $this->assertStringContainsString('in:success,failed,partial', $rules['status']);
         $this->assertStringContainsString('required', $rules['scraped_at']);
     }
