@@ -27,6 +27,5 @@ Route::middleware([
     
     Route::middleware('admin')->group(function () {
         Route::get('/admin/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('admin.dashboard');
-        Route::post('/admin/add-restaurants', [App\Http\Controllers\AdminController::class, 'addRestaurantsFromLocation'])->name('admin.add-restaurants');
     });
 });

@@ -16,13 +16,11 @@ class Menu extends Model
         'name',
         'menu_type',
         'is_active',
-        'scraped_at',
         'source_url',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'scraped_at' => 'datetime',
     ];
 
     /**
@@ -78,40 +76,6 @@ class Menu extends Model
             'name' => 'required|string|max:255',
             'menu_type' => 'required|in:scraped,manual,seasonal',
             'is_active' => 'boolean',
-            'scraped_at' => 'nullable|date',
-            'source_url' => 'nullable|url|max:255',
         ];
-    }
-
-    /**
-     * Check if this menu is currently active.
-     */
-    public function isActive(): bool
-    {
-        return $this->is_active;
-    }
-
-    /**
-     * Check if this menu was scraped.
-     */
-    public function isScraped(): bool
-    {
-        return $this->menu_type === 'scraped';
-    }
-
-    /**
-     * Get the count of menu items in this menu.
-     */
-    public function getItemsCount(): int
-    {
-        return $this->menuItems()->count();
-    }
-
-    /**
-     * Get the count of available menu items in this menu.
-     */
-    public function getAvailableItemsCount(): int
-    {
-        return $this->menuItems()->where('is_available', true)->count();
     }
 }
