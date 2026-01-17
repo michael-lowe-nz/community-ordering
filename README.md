@@ -100,6 +100,8 @@ php artisan test
 
 ## Common Development Tasks
 
+To login as the admin user, you need to run the migrations, then reset your password using Mailpit, which can be found on localhost:8025
+
 ### Daily Development Commands
 
 ```bash
