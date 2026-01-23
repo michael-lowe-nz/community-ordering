@@ -18,6 +18,7 @@ class RestaurantSeeder extends Seeder
     public function run()
     {
         $apiKey = env('GOOGLE_PLACES_API_KEY');
+        $keywords = 'Pickle Jar';
         
         if (!$apiKey) {
             $this->command->error('Google Places API key not found in environment variables');
@@ -27,15 +28,13 @@ class RestaurantSeeder extends Seeder
         $cities = [
             [
                 'name' => 'Wellington',
-                // 'location' => '37.7937,-122.3965',
                 'location' => '-41.2865,174.7762',
                 'radius' => 20000, // 20km radius
             ],
-            // Add more cities as needed
         ];
         
         foreach ($cities as $city) {
-            $this->seedRestaurantsForCity($city, $apiKey);
+            $this->seedRestaurantsForCity($city, $apiKey, $keywords);
         }
         
         $this->command->info('Restaurant seeding completed successfully!');
@@ -49,7 +48,7 @@ class RestaurantSeeder extends Seeder
      * @param string $apiKey
      * @return void
      */
-    private function seedRestaurantsForCity($city, $apiKey)
+    private function seedRestaurantsForCity($city, $apiKey, $keywords)
     {
         $this->command->info("Fetching restaurants for {$city['name']}...");
         
@@ -58,24 +57,13 @@ class RestaurantSeeder extends Seeder
         
         do {
             // Build the API request
-            // $endpoint = 'https://places.googleapis.com/v1/places:searchNearby';
             $endpoint = 'https://places.googleapis.com/v1/places:searchText';
             
             [$lat, $lng] = explode(',', $city['location']);
             
             $requestBody = [
                 'maxResultCount' => 20,
-                'textQuery' => sprintf('chinese restaurants in %s', $city['name']),
-                // 'fieldMask' => 'places.displayName,places.formattedAddress,places.priceLevel',
-                // 'locationRestriction' => [
-                //     'circle' => [
-                //         'center' => [
-                //             'latitude' => (float)$lat,
-                //             'longitude' => (float)$lng
-                //         ],
-                //         'radius' => (float)$city['radius']
-                //     ]
-                // ]
+                'textQuery' => sprintf('%s in %s', $keywords, $city['name']),
             ];
             
             // Make the API request

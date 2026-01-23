@@ -10,6 +10,7 @@ class RestaurantController
     public function index()
     {
         $restaurants = Restaurant::orderBy('name', 'asc')->get();
+        dlfk;
         return view('restaurants.index', compact('restaurants'));
     }
 

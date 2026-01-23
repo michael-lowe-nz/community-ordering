@@ -123,4 +123,10 @@
             </div>
         </div>
     </div>
+    <div class="mb-12">
+        <form action="{{ route('restaurants.orders.store', $restaurant) }}" method="POST" class="inline">
+        @csrf
+            <button type="submit" class="text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-md font-semibold transition-colors duration-200">Add New Order</button>
+        </form>
+    </div>
 </x-public-layout>

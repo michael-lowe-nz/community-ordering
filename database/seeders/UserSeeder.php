@@ -19,7 +19,8 @@ class UserSeeder extends Seeder
             'name' => 'Michael Lowe',
             'email' => 'lowe.michael.nz@gmail.com',
             'email_verified_at' => now(),
-            'password' => Hash::make(Str::random(16)), // Random password that will be reset
+            // If dev, we set a known password, else random
+            'password' => env('APP_ENV') === 'local' ? Hash::make('password') : Hash::make(Str::random(16)),
             'remember_token' => Str::random(10),
             'is_admin' => true,
         ]);
