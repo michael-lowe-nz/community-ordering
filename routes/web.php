@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -12,6 +13,8 @@ Route::get('/restaurant/{restaurant}', [RestaurantController::class, 'show']);
 Route::post('/restaurant/{restaurant}/orders', [OrderController::class, 'store'])
     ->name('restaurants.orders.store');
 Route::get('restaurant/{restaurant}/orders/create', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');
+Route::get('restaurant/{restaurant}/orders/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('restaurants.orders.show');
+Route::post('restaurant/{restaurant}/orders/{order}', [App\Http\Controllers\OrderController::class, 'addToOrder'])->name('restaurants.orders.addToOrder');
 
 Route::get('/health-check', function () {
     return response('OK', 200);

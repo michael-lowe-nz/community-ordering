@@ -34,6 +34,14 @@ class Restaurant extends Model
     }
 
     /**
+     * Get the orders for this restaurant.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * Get validation rules for restaurant model.
      */
     public static function validationRules(): array

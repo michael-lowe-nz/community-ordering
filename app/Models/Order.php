@@ -18,4 +18,12 @@ class Order extends Model
     {
         return $this->hasOneThrough(Restaurant::class, Menu::class, 'id', 'id', 'menu_id', 'restaurant_id');
     }
+
+    /**
+     * Get all items for this order.
+     */
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
