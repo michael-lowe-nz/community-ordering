@@ -7,12 +7,9 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ url('/') }}">
                         <div class="flex items-center">
-                            <div class="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-full mr-2">
-                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                </svg>
+                            <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full mr-2">
                             </div>
-                            <span class="text-xl font-bold text-gray-900">Restaurant Directory</span>
+                            <span class="text-xl font-bold text-gray-900">enoughfood</span>
                         </div>
                     </a>
                 </div>
@@ -21,9 +18,6 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <a href="{{ url('/') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->is('/') ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
                         {{ __('Home') }}
-                    </a>
-                    <a href="/restaurant" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->is('restaurant*') ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                        {{ __('Restaurants') }}
                     </a>
                 </div>
             </div>

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class MenuItem extends Model
 {
@@ -18,11 +19,13 @@ class MenuItem extends Model
         'price',
         'section',
         'order_index',
+        'is_available',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'order_index' => 'integer',
+        'is_available' => 'boolean',
     ];
 
     /**
@@ -39,6 +42,16 @@ class MenuItem extends Model
     public function restaurant()
     {
         return $this->hasOneThrough(Restaurant::class, Menu::class, 'id', 'id', 'menu_id', 'restaurant_id');
+    }
+
+    /**
+     * Get the orders that contain this menu item.
+     */
+    public function orders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class, 'menu_item_order')
+            ->withPivot('quantity', 'price', 'special_requests')
+            ->withTimestamps();
     }
 
     /**

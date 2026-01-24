@@ -12,9 +12,10 @@ class RestaurantController
         $restaurants = Restaurant::orderBy('name', 'asc')->get();
         return view('restaurants.index', compact('restaurants'));
     }
-
+        
     public function show(Restaurant $restaurant)
     {
-        return view('restaurants.show', compact('restaurant'));
+        return view('restaurants.show', compact('restaurant'))
+            ->with('orders', $restaurant->orders()->get());
     }
 }

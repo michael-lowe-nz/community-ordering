@@ -26,11 +26,32 @@ class Restaurant extends Model
     ];
 
     /**
+     * Get the formatted location (suburb, city).
+     */
+    public function getLocationAttribute(): string
+    {
+        $parts = array_filter([
+            $this->suburb,
+            $this->city,
+        ]);
+
+        return implode(', ', $parts);
+    }
+
+    /**
      * Get the menus for this restaurant.
      */
     public function menus(): HasMany
     {
         return $this->hasMany(Menu::class);
+    }
+
+    /**
+     * Get the orders for this restaurant.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     /**

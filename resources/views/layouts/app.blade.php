@@ -16,12 +16,13 @@
 
         <!-- Styles -->
         @livewireStyles
+        @fluxAppearance
     </head>
     <body class="font-sans antialiased">
         <x-banner />
 
         <div class="min-h-screen bg-gray-100">
-            @livewire('navigation-menu')
+            <x-navigation />
 
             <!-- Page Heading -->
             @if (isset($header))
@@ -41,5 +42,6 @@
         @stack('modals')
 
         @livewireScripts
+        @fluxScripts
     </body>
 </html>
