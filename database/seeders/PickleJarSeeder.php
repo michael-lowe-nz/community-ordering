@@ -38,11 +38,11 @@ class PickleJarSeeder extends Seeder
             [
                 'notes' => 'Papa, Rodger, James, Michael, Jeff - little bit too much',
                 'items' => [
-                    ['name' => 'Pizza', 'quantity' => 1.5],
+                    ['name' => 'Pizza', 'quantity' => 1],
                 ]
             ],
             [
-                'notes' => '9 people: Papa, Rodger, Patricia, Janet, Belinda, Michael, Awhina, Jeff - 0.5m left over',
+                'notes' => '9 people: Papa, Rodger, Patricia, Janet, Belinda, Michael, Awhina, Jeff - 1m left over',
                 'items' => [
                     ['name' => 'Pizza', 'quantity' => 2],
                     ['name' => 'Chips', 'quantity' => 2],
@@ -64,11 +64,11 @@ class PickleJarSeeder extends Seeder
             [
                 'notes' => 'Mertilla Di Pollo, Speziato, Selvaggio, Amore, Margherita Amore Speziato',
                 'items' => [
-                    ['name' => 'Mertilla Di Pollo', 'quantity' => 0.5],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Selvaggio', 'quantity' => 0.5],
-                    ['name' => 'Amore', 'quantity' => 0.5],
-                    ['name' => 'Margherita Amore Speziato', 'quantity' => 0.5],
+                    ['name' => 'Mertilla Di Pollo', 'quantity' => 1],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Selvaggio', 'quantity' => 1],
+                    ['name' => 'Amore', 'quantity' => 1],
+                    ['name' => 'Margherita Amore Speziato', 'quantity' => 1],
                 ]
             ],
             [
@@ -81,9 +81,9 @@ class PickleJarSeeder extends Seeder
             [
                 'notes' => 'Papa, Rodger, James, Michael, Jeff, Janet - little bit too much',
                 'items' => [
-                    ['name' => 'Amore', 'quantity' => 0.5],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Menzo Bernese', 'quantity' => 0.5],
+                    ['name' => 'Amore', 'quantity' => 1],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Menzo Bernese', 'quantity' => 1],
                 ]
             ],
             [
@@ -95,96 +95,96 @@ class PickleJarSeeder extends Seeder
             [
                 'notes' => 'Michael, Jacqui, Papa, Jamie - too much but wanted leftovers',
                 'items' => [
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Amore', 'quantity' => 0.5],
-                    ['name' => 'Tricolore', 'quantity' => 0.5],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Amore', 'quantity' => 1],
+                    ['name' => 'Tricolore', 'quantity' => 1],
                 ]
             ],
             [
-                'notes' => 'Michael, Kevin, Papa, Bel, Jan - 0.5m left over',
+                'notes' => 'Michael, Kevin, Papa, Bel, Jan - 1m left over',
                 'items' => [
-                    ['name' => 'Pizza', 'quantity' => 1.5],
+                    ['name' => 'Pizza', 'quantity' => 15],
                 ]
             ],
             [
                 'notes' => 'Michael, Janet, Jacqui, Awhina, Atawhai, Kevin - 6 people',
                 'items' => [
-                    ['name' => 'Amore', 'quantity' => 0.5],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Mertilla Di Pollo', 'quantity' => 0.5],
+                    ['name' => 'Amore', 'quantity' => 1],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Mertilla Di Pollo', 'quantity' => 1],
                     ['name' => 'Chips', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => '9 people order',
                 'items' => [
-                    ['name' => 'Margherita', 'quantity' => 0.5],
-                    ['name' => 'Amore', 'quantity' => 0.5],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Menzo Bernese', 'quantity' => 0.5],
+                    ['name' => 'Margherita', 'quantity' => 1],
+                    ['name' => 'Amore', 'quantity' => 1],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Menzo Bernese', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => '7 people order',
                 'items' => [
-                    ['name' => 'Margherita', 'quantity' => 0.5],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Amore', 'quantity' => 0.5],
-                    ['name' => 'Selvaggio', 'quantity' => 0.5],
+                    ['name' => 'Margherita', 'quantity' => 1],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Amore', 'quantity' => 1],
+                    ['name' => 'Selvaggio', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => '12 people order',
                 'items' => [
                     ['name' => 'Amore', 'quantity' => 1],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Margherita', 'quantity' => 0.5],
-                    ['name' => 'Ponsonby', 'quantity' => 0.5],
-                    ['name' => 'Homewood', 'quantity' => 0.5],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Margherita', 'quantity' => 1],
+                    ['name' => 'Ponsonby', 'quantity' => 1],
+                    ['name' => 'Homewood', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => '14 people: Belinda, Sage, Michael, Janet, Rodger, Kevin, Annaleise, Jamie, Atawhai, Bede, Patricia, Awhina, James, Jeff',
                 'items' => [
-                    ['name' => 'Amore', 'quantity' => 0.5],
+                    ['name' => 'Amore', 'quantity' => 1],
                     ['name' => 'Homewood', 'quantity' => 1],
-                    ['name' => 'Ponsonby Road', 'quantity' => 0.5],
+                    ['name' => 'Ponsonby Road', 'quantity' => 1],
                     ['name' => 'Speziato', 'quantity' => 1],
-                    ['name' => 'Margherita', 'quantity' => 0.5],
+                    ['name' => 'Margherita', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => '9 people order',
                 'items' => [
                     ['name' => 'Homewood', 'quantity' => 1],
-                    ['name' => 'Amore', 'quantity' => 0.5],
-                    ['name' => 'Ponsonby', 'quantity' => 0.5],
+                    ['name' => 'Amore', 'quantity' => 1],
+                    ['name' => 'Ponsonby', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => 'Another order',
                 'items' => [
-                    ['name' => 'Homewood', 'quantity' => 0.5],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Margherita', 'quantity' => 0.5],
-                    ['name' => 'Amore', 'quantity' => 0.5],
+                    ['name' => 'Homewood', 'quantity' => 1],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Margherita', 'quantity' => 1],
+                    ['name' => 'Amore', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => '9 people order',
                 'items' => [
-                    ['name' => 'Homewood', 'quantity' => 0.5],
-                    ['name' => 'Speziato', 'quantity' => 0.5],
-                    ['name' => 'Mertilla Di Pollo', 'quantity' => 0.5],
-                    ['name' => 'Amore Messines', 'quantity' => 0.5],
+                    ['name' => 'Homewood', 'quantity' => 1],
+                    ['name' => 'Speziato', 'quantity' => 1],
+                    ['name' => 'Mertilla Di Pollo', 'quantity' => 1],
+                    ['name' => 'Amore Messines', 'quantity' => 1],
                 ]
             ],
             [
                 'notes' => 'Final orders',
                 'items' => [
-                    ['name' => 'Birdwood', 'quantity' => 0.5],
-                    ['name' => 'Monaghan', 'quantity' => 0.5],
-                    ['name' => 'Hatton', 'quantity' => 0.5],
+                    ['name' => 'Birdwood', 'quantity' => 1],
+                    ['name' => 'Monaghan', 'quantity' => 1],
+                    ['name' => 'Hatton', 'quantity' => 1],
                 ]
             ],
         ];
