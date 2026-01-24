@@ -22,7 +22,9 @@ class RestaurantSeeder extends Seeder
             "Aries Tennyson St",
             "K.C Cafe",
             "Dragons Tory Street",
-            "Chaat Street"
+            "Chaat Street",
+            "Corfu Karori",
+            "Chow Tory",
         ];
 
         $apiKey = env('GOOGLE_PLACES_API_KEY');

@@ -7,13 +7,6 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <a href="/restaurant" class="text-orange-600 hover:text-orange-800 mb-4 inline-flex items-center transition-colors duration-200">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Back to Restaurants
-            </a>
-            
             <div class="bg-white rounded-lg shadow-md p-8 mt-4">
                 <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
                     <div>

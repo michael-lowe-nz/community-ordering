@@ -12,6 +12,14 @@ class Order extends Model
     ];
 
     /**
+     * Get the formatted creation time.
+     */
+    public function getFormattedCreatedAtAttribute(): string
+    {
+        return $this->created_at->diffForHumans();
+    }
+
+    /**
      * Get the restaurant through the menu relationship.
      */
     public function restaurant()
