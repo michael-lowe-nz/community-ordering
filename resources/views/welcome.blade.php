@@ -21,7 +21,7 @@
         <x-banner />
 
         <div class="min-h-screen bg-gray-50">
-            <x-public-navigation />
+            <x-navigation />
         </div>
 
         @stack('modals')
