@@ -9,7 +9,10 @@ class HomeController
 {
     public function index()
     {
-        $restaurants = Restaurant::orderBy('name', 'asc')->get();
+        $restaurants = Restaurant::withCount('orders')
+            // ->having('orders_count', '>', 0)
+            ->orderBy('orders_count', 'desc')
+            ->get();
         return view('home')->with('restaurants', $restaurants);
     }
 }

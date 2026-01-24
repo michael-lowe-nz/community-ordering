@@ -17,8 +17,15 @@ class RestaurantSeeder extends Seeder
      */
     public function run()
     {
+        $restaurantsNamesInitial = [
+            "Pickle Jar Karori",
+            "Aries Tennyson St",
+            "K.C Cafe",
+            "Dragons Tory Street",
+            "Chaat Street"
+        ];
+
         $apiKey = env('GOOGLE_PLACES_API_KEY');
-        $keywords = 'Pickle Jar';
         
         if (!$apiKey) {
             $this->command->error('Google Places API key not found in environment variables');
@@ -34,7 +41,9 @@ class RestaurantSeeder extends Seeder
         ];
         
         foreach ($cities as $city) {
-            $this->seedRestaurantsForCity($city, $apiKey, $keywords);
+            foreach($restaurantsNamesInitial as $restaurantName) {
+                $this->seedRestaurantsForCity($city, $apiKey, $restaurantName);
+            }
         }
         
         $this->command->info('Restaurant seeding completed successfully!');
@@ -76,7 +85,13 @@ class RestaurantSeeder extends Seeder
                     'places.priceLevel',
                     'places.id',
                     'places.nationalPhoneNumber',
-                    'places.websiteUri'
+                    'places.websiteUri',
+                    'places.displayName',
+                    'places.formattedAddress',
+                    'places.postalAddress.locality',
+                    'places.postalAddress.sublocality',
+                    'places.shortFormattedAddress',
+
                 ]),
             ])->post($endpoint, $requestBody);
             
@@ -113,7 +128,6 @@ class RestaurantSeeder extends Seeder
     {
         // Check if restaurant already exists
         $existingRestaurant = Restaurant::where('google_place_id', $place['id'])->first();
-        // $existingRestaurant = null;
 
         if ($existingRestaurant) {
             // Update existing restaurant
@@ -121,10 +135,12 @@ class RestaurantSeeder extends Seeder
                 'name' => $place['displayName']['text'],
                 'google_place_id' => $place['id'],
                 'address' => $place['formattedAddress'],
+                'city' => $place['postalAddress']['locality'] ?? $cityName,
+                'suburb' => $place['postalAddress']['sublocality'] ?? null,
                 'phone' => $place['nationalPhoneNumber'] ?? null,
                 'website' => $place['websiteUri'] ?? null,
                 'updated_at' => Carbon::now(),
-            ]);
+                ]);
         } else {
             // Create new restaurant
             Restaurant::create([
@@ -132,6 +148,8 @@ class RestaurantSeeder extends Seeder
                 'google_place_id' => $place['id'],
                 'address' => $place['formattedAddress'],
                 'phone' => $place['nationalPhoneNumber'] ?? null,
+                'city' => $place['postalAddress']['locality'] ?? $cityName,
+                'suburb' => $place['postalAddress']['sublocality'] ?? null,
                 'website' => $place['websiteUri'] ?? null,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

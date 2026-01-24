@@ -34,7 +34,7 @@
                             <flux:heading size="xl">
                                 {{$restaurant->name}}
                             </flux:heading>
-                            <flux:subheading size="md">{{$restaurant->address}}</flux:heading>
+                            <flux:subheading size="md">{{$restaurant->location}}</flux:subheading>
                         </flux:card>
                     </a>
                     @endforeach
