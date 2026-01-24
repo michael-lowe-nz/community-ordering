@@ -24,23 +24,22 @@
             <x-navigation />
             <div class="py-12">
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 bg-white border-b border-gray-200">
-                            <p>Welcome to Enough Food, your solution for restaurant order record keeping!</p>
-                            <ul>
-                                @foreach($restaurants as $restaurant)
-                                    <li class="mt-4">
-                                        <a href="/restaurant/{{ $restaurant->id }}" class="text-orange-600 hover:text-orange-800 transition-colors duration-200">
-                                            {{ $restaurant->name }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
+                    @foreach($restaurants as $restaurant)
+                    <a href="/restaurant/{{ $restaurant->id }}" >
+                        <flux:card class="hover:bg-zinc-50 dark:hover:bg-zinc-700 mb-4">
+                            <div class="flex items-center mb-4">
+                                <flux:avatar badge="{{$restaurant->orders()->count()}}" name="{{$restaurant->name}}" color="auto" color:seed="{{ $restaurant->id }}" />
+                                <flux:icon name="arrow-up-right" class="ml-auto text-zinc-400" variant="micro" />
+                            </div>
+                            <flux:heading size="xl">
+                                {{$restaurant->name}}
+                            </flux:heading>
+                            <flux:subheading size="md">{{$restaurant->address}}</flux:heading>
+                        </flux:card>
+                    </a>
+                    @endforeach
                 </div>
             </div>
-        </div>
 
         @stack('modals')
         @livewireScripts
