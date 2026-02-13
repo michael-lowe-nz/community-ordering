@@ -61,4 +61,10 @@ class Order extends Model
     {
         return $this->created_at->diffForHumans();
     }
+
+    /** Get the short formatted date of creation time. */
+    public function getShortFormattedCreatedAtAttribute(): string
+    {
+        return $this->created_at->format('d M j, Y');
+    }
 }
