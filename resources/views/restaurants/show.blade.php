@@ -13,7 +13,7 @@
             <a href="{{ route('restaurants.orders.show', [$restaurant, $order]) }}" >
                 <flux:card class="hover:bg-zinc-50 dark:hover:bg-zinc-700 mb-4">
                     <flux:heading size="m">
-                        {{$order->created_at}}
+                        {{$order->formatted_created_at}}
                     </flux:heading>
                     <flux:subheading size="md">{{$restaurant->location}}</flux:subheading>
                 </flux:card>
