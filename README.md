@@ -7,7 +7,7 @@ A modern Laravel 12.0 application for restaurant management and discovery, built
 - **Backend**: Laravel 12.0 with PHP 8.2+
 - **Frontend**: Livewire 3.0, Tailwind CSS 3.4, Vite 6.0
 - **Authentication**: Laravel Jetstream with Sanctum
-- **Database**: MySQL 8.0
+- **Database**: PostgreSQL 18
 - **Development**: Laravel Sail, Docker Compose
 - **Testing**: PHPUnit 11.5
 - **Code Quality**: Laravel Pint
@@ -33,7 +33,7 @@ cp .env.example .env
 
 2. **Start development environment**:
 ```bash
-# Start all services (Laravel, MySQL, Mailpit)
+# Start all services (Laravel, PostgreSQL, Mailpit)
 ./vendor/bin/sail up -d
 
 # Or use Docker Compose directly
