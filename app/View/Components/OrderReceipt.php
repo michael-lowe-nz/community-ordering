@@ -11,7 +11,7 @@ class OrderReceipt extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct(public $orderItems) {}
+    public function __construct(public $order) {}
 
     /**
      * Get the view / contents that represent the component.

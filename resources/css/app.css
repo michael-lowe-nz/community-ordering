@@ -29,6 +29,7 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -39,7 +40,7 @@
 }
 
 [x-cloak] {
-    display: none;
+  display: none;
 }
 
 .receipt {
@@ -48,8 +49,10 @@
   background-size: 8px 4px;
   padding: 4px 0;
 }
+
 .receipt-list {
   background-color: white;
+  height: 100%;
 }
 
 .receipt {
@@ -57,10 +60,12 @@
   max-width: 320px;
   margin: 0 auto;
 }
+
 .receipt-list {
   background-color: #fff;
   padding: 30px;
 }
+
 .receipt-item {
   border-bottom: 0.5px dashed #ccc;
   line-height: 1;
@@ -68,12 +73,15 @@
   font-family: monospace;
   font-size: 16px;
 }
+
 .receipt-item:not(:first-child) {
   margin-top: 1rem;
 }
+
 .receipt-label {
   float: left;
 }
+
 .receipt-value {
   float: right;
 }
