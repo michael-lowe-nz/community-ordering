@@ -16,6 +16,6 @@ class RestaurantController
     public function show(Restaurant $restaurant)
     {
         return view('restaurants.show', compact('restaurant'))
-            ->with('orders', $restaurant->orders()->get());
+            ->with('orders', $restaurant->orders()->latest()->get());
     }
 }

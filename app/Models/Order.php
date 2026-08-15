@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -66,5 +67,28 @@ class Order extends Model
     public function getShortFormattedCreatedAtAttribute(): string
     {
         return $this->created_at->format('d M j, Y');
+    }
+
+    public static function defaultTitle(?\DateTimeInterface $date = null): string
+    {
+        $now = $date ? Carbon::instance($date) : now();
+
+        $period = match (true) {
+            $now->hour >= 22 || $now->hour < 5 => 'night',
+            $now->hour < 12 => 'morning',
+            $now->hour < 15 => 'lunch',
+            $now->hour < 19 => 'afternoon',
+            default => 'night',
+        };
+
+        return $now->translatedFormat('l') . ' ' . $period;
+    }
+
+    /** Get the order title with a sensible fallback. */
+    public function getTitleAttribute(): string
+    {
+        $content = trim((string) ($this->content ?? ''));
+
+        return $content !== '' ? $content : self::defaultTitle();
     }
 }

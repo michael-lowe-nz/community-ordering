@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use Illuminate\Http\Request;
-use App\Models\Restaurant;
 use App\Models\OrderItem;
+use App\Models\Restaurant;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController
 {
@@ -14,19 +15,21 @@ class OrderController
         return view('order.show', compact('restaurant', 'order'))
             ->with('orderItems', $order->items()->get());
     }
+
     /**
      * Store a newly created resource in storage.
-    */
+     */
     public function store(Restaurant $restaurant)
     {
         $order = $restaurant->orders()->create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'content' => null,
         ]);
+
         return redirect()
             ->route('restaurants.orders.show', [$restaurant, $order])
             ->with('message', 'Order created successfully');
-    //
+        //
     }
 
     public function addToOrder(Restaurant $restaurant, Order $order, Request $request)
@@ -42,7 +45,7 @@ class OrderController
         ]);
 
         $order->items()->save($orderItem);
-            
+
         return redirect()
             ->route('restaurants.orders.show', [$restaurant, $order])
             ->with('message', 'Item added to order successfully');

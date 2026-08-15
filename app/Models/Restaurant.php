@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Restaurant extends Model
 {
@@ -22,8 +23,7 @@ class Restaurant extends Model
         'google_place_id',
     ];
 
-    protected $casts = [
-    ];
+    protected $casts = [];
 
     /**
      * Get the formatted location (suburb, city).
@@ -52,6 +52,14 @@ class Restaurant extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the order items for this restaurant through orders.
+     */
+    public function orderItems(): HasManyThrough
+    {
+        return $this->hasManyThrough(OrderItem::class, Order::class);
     }
 
     /**
