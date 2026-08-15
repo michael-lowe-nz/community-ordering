@@ -42,7 +42,7 @@
                             @foreach ($suggestions as $suggestion)
                                 <button
                                     type="button"
-                                    wire:click="chooseSuggestion('{{ addslashes($suggestion) }}')"
+                                    wire:click="chooseSuggestion(@js($suggestion))"
                                     class="block w-full border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-orange-50 hover:text-orange-700 last:border-b-0"
                                 >
                                     {{ $suggestion }}

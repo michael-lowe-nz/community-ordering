@@ -89,14 +89,18 @@ class Create extends Component
     public function startTitleEdit(): void
     {
         $this->editingTitle = true;
-        $this->orderTitle = trim((string) ($this->order->content ?? '')) ?: $this->order->title;
+        $this->orderTitle = trim((string) ($this->order->content ?? '')) !== ''
+            ? trim((string) $this->order->content)
+            : $this->order->title;
     }
 
     public function saveTitle(): void
     {
-        $this->orderTitle = trim($this->orderTitle) ?: $this->order->title;
-        $this->order->content = $this->orderTitle;
+        $this->orderTitle = trim((string) $this->orderTitle);
+
+        $this->order->content = $this->orderTitle !== '' ? $this->orderTitle : $this->order->title;
         $this->order->save();
+
         $this->editingTitle = false;
     }
 
