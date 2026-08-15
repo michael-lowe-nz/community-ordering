@@ -21,6 +21,28 @@
         @endif
     </div>
 
+    @if (! empty($availableItems))
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <h3 class="mb-4 text-lg font-semibold text-slate-900">Quick add</h3>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                @foreach ($availableItems as $item)
+                    <button
+                        type="button"
+                        wire:click="quickAddItem(@js($item['name']), @js($item['price']))"
+                        class="flex flex-col rounded-xl border border-slate-200 bg-slate-50 p-3 text-left transition hover:border-orange-400 hover:bg-orange-50"
+                    >
+                        <p class="truncate font-medium text-slate-900">{{ $item['name'] }}</p>
+                        @if ($item['price'])
+                            <p class="mt-1 text-sm text-slate-600">${{ number_format($item['price'], 2) }}</p>
+                        @else
+                            <p class="mt-1 text-sm text-slate-400">Price TBD</p>
+                        @endif
+                    </button>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <form wire:submit.prevent="addItem" class="space-y-6">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div class="mb-5">

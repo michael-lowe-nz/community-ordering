@@ -33,9 +33,30 @@ class Create extends Component
 
     public array $suggestions = [];
 
+    public array $availableItems = [];
+
     public function mount(): void
     {
         $this->orderTitle = trim((string) ($this->order->content ?? '')) ?: $this->order->title;
+        $this->loadAvailableItems();
+    }
+
+    protected function loadAvailableItems(): void
+    {
+        $menuIds = $this->restaurant->menus()->pluck('id');
+
+        if ($menuIds->isEmpty()) {
+            $this->availableItems = [];
+
+            return;
+        }
+
+        $this->availableItems = MenuItem::whereIn('menu_id', $menuIds)
+            ->where('is_available', true)
+            ->select('id', 'name', 'price')
+            ->orderBy('order_index')
+            ->get()
+            ->toArray();
     }
 
     public function updatedQuery(string $value): void
@@ -161,6 +182,15 @@ class Create extends Component
     {
         $this->order->items()->whereKey($itemId)->delete();
         $this->editingItemId = ($this->editingItemId === $itemId) ? null : $this->editingItemId;
+    }
+
+    public function quickAddItem(string $name, ?float $price): void
+    {
+        $this->order->items()->create([
+            'name' => $name,
+            'quantity' => 1,
+            'price' => $price,
+        ]);
     }
 
     public function render()
