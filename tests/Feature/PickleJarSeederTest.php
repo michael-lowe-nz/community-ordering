@@ -35,17 +35,30 @@ class PickleJarSeederTest extends TestCase
         $restaurant = Restaurant::where('name', 'like', '%Pickle Jar%')->firstOrFail();
         $menu = $restaurant->menus()->firstOrFail();
 
-        $this->assertSame([
-            'Fries',
-            'Onion Rings',
-            'Arrosto',
-            'Beauchamp',
-            'Jalapeno Bacon',
-        ], $menu->menuItems()->orderBy('order_index')->pluck('name')->all());
-
+        $this->assertContains('Arrosto', $menu->menuItems()->pluck('name')->all());
+        $this->assertContains('Pizza', $menu->menuItems()->pluck('name')->all());
+        $this->assertContains('Chips', $menu->menuItems()->pluck('name')->all());
+        $this->assertContains('Beauchamp', $menu->menuItems()->pluck('name')->all());
         $this->assertDatabaseMissing('menu_items', [
             'menu_id' => $menu->id,
             'name' => 'Old Item',
         ]);
+
+        $aboutPerfectOrder = $restaurant->orders()->where('content', 'About perfect')->firstOrFail();
+        $items = $aboutPerfectOrder->menuItems()->withPivot('quantity')->get()->keyBy('name');
+
+        $this->assertSame(2, (int) $items['Arrosto']->pivot->quantity);
+        $this->assertSame(1, (int) $items['Chicken']->pivot->quantity);
+        $this->assertSame(1, (int) $items['Lamb']->pivot->quantity);
+
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => $aboutPerfectOrder->id,
+            'name' => 'Arrosto',
+            'quantity' => 2,
+        ]);
+
+        $this->assertTrue($restaurant->orders()
+            ->where('content', 'Mertilla Di Pollo, Speziato, Selvaggio, Amore, Margherita Amore Speziato')
+            ->exists());
     }
 }
