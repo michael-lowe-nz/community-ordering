@@ -9,7 +9,7 @@
                         <div class="flex items-center">
                             <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full mr-2">
                             </div>
-                            <span class="text-xl font-bold text-gray-900">no more no less.</span>
+                            <span class="text-xl font-bold text-gray-900">{{ config('app.name', 'no more no less') }}.</span>
                         </div>
                     </a>
                 </div>
