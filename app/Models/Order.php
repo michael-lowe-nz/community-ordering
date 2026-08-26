@@ -3,13 +3,17 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
+    /** @use HasFactory<\Database\Factories\OrderFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'restaurant_id',
         'user_id',
@@ -81,7 +85,7 @@ class Order extends Model
             default => 'night',
         };
 
-        return $now->translatedFormat('l') . ' ' . $period;
+        return $now->translatedFormat('l').' '.$period;
     }
 
     /** Get the order title with a sensible fallback. */
