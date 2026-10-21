@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuItem extends Model
 {
@@ -52,6 +53,14 @@ class MenuItem extends Model
         return $this->belongsToMany(Order::class, 'menu_item_order')
             ->withPivot('quantity', 'price', 'special_requests')
             ->withTimestamps();
+    }
+
+    /**
+     * Get the order items that reference this menu item.
+     */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
     }
 
     /**

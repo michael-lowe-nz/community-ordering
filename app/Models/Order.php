@@ -19,10 +19,13 @@ class Order extends Model
         'user_id',
         'content',
         'participant_count',
+        'notes',
+        'ordered_at',
     ];
 
     protected $casts = [
         'participant_count' => 'integer',
+        'ordered_at' => 'datetime',
     ];
 
     /**

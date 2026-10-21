@@ -1,10 +1,12 @@
 <x-public-layout>
     <x-slot name="header">
-        <div class="flex flex-col leading-tight">
-            <h1 class="text-xl font-semibold text-gray-800 sm:text-2xl">Order Details</h1>
-            <a href="{{ route('restaurants.show', $restaurant) }}" class="mt-1 text-xl font-semibold text-orange-600 transition hover:text-orange-700 sm:text-2xl">
-                {{ $restaurant->name }}
-            </a>
+        <div class="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+            <div class="flex flex-col leading-tight">
+                <h1 class="text-xl font-semibold text-gray-800 sm:text-2xl">Order Details</h1>
+                <a href="{{ route('restaurants.show', $restaurant) }}" class="mt-1 text-xl font-semibold text-orange-600 transition hover:text-orange-700 sm:text-2xl">
+                    {{ $restaurant->name }}
+                </a>
+            </div>
         </div>
     </x-slot>
 

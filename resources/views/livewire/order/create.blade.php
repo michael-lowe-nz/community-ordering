@@ -28,7 +28,7 @@
                 @foreach ($availableItems as $item)
                     <button
                         type="button"
-                        wire:click="quickAddItem(@js($item['name']), @js($item['price']))"
+                        wire:click="quickAddItem(@js($item['id']))"
                         class="flex flex-col rounded-xl border border-slate-200 bg-slate-50 p-3 text-left transition hover:border-orange-400 hover:bg-orange-50"
                     >
                         <p class="truncate font-medium text-slate-900">{{ $item['name'] }}</p>
@@ -114,12 +114,12 @@
                 <span class="text-sm text-slate-500">{{ $order->items()->count() }} item{{ $order->items()->count() === 1 ? '' : 's' }}</span>
             </div>
 
-            @forelse ($order->items()->orderBy('created_at')->get() as $item)
+            @forelse ($order->items()->with('menuItem')->orderBy('created_at')->get() as $item)
                 <div x-data="{ open: false }" class="relative border-b border-slate-100 py-3 last:border-b-0">
                     <div class="flex items-center justify-between gap-3">
                         <div>
-                            <p class="font-medium text-slate-800">{{ $item->name }}</p>
-                            <p class="text-sm text-slate-500">{{ $item->quantity }} × {{ $item->price ? '$' . number_format($item->price, 2) : 'Price TBD' }}</p>
+                            <p class="font-medium text-slate-800">{{ $item->menuItem?->name ?? '—' }}</p>
+                            <p class="text-sm text-slate-500">{{ $item->quantity }} × {{ $item->menuItem?->price ? '$' . number_format($item->menuItem->price, 2) : 'Price TBD' }}</p>
                         </div>
 
                         <div class="relative flex items-center gap-2">
@@ -140,11 +140,7 @@
                     @if ($editingItemId === $item->id)
                         <div class="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
                             <div class="flex flex-col gap-3 sm:flex-row">
-                                <input
-                                    type="text"
-                                    wire:model="itemDraftName"
-                                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
-                                >
+                                <p class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500">{{ $item->menuItem?->name ?? '—' }}</p>
                                 <input
                                     type="number"
                                     min="1"
@@ -153,7 +149,7 @@
                                     class="w-24 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                                 >
                             </div>
-                            @error('itemDraftName')
+                            @error('itemDraftQuantity')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                             <div class="mt-3 flex gap-2">

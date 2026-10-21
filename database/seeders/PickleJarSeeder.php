@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Restaurant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -29,7 +28,6 @@ class PickleJarSeeder extends Seeder
         }
 
         $restaurant->orders()->each(function ($order) {
-            $order->menuItems()->detach();
             $order->delete();
         });
 
@@ -265,18 +263,9 @@ class PickleJarSeeder extends Seeder
                     ]);
                 }
 
-                $order->menuItems()->syncWithoutDetaching([
-                    $menuItem->id => [
-                        'quantity' => (int) $itemData['quantity'],
-                        'price' => $menuItem->price,
-                        'special_requests' => null,
-                    ],
-                ]);
-
                 $order->items()->create([
-                    'name' => $menuItem->name,
+                    'menu_item_id' => $menuItem->id,
                     'quantity' => (int) $itemData['quantity'],
-                    'price' => $menuItem->price,
                     'notes' => null,
                 ]);
             }

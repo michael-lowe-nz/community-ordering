@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RestaurantController;
+use App\Livewire\OrderCreate;
+use App\Livewire\OrderShow;
+use App\Livewire\RestaurantView;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -9,6 +12,9 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 
 Route::get('/restaurant', [RestaurantController::class, 'index'])->name('restaurants.index');
 Route::get('/restaurant/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show');
+Route::get('/restaurants/{restaurant}', RestaurantView::class)->name('restaurants.view');
+Route::get('/restaurants/{restaurant}/orders/create', OrderCreate::class)->middleware('auth')->name('restaurants.orders.create.livewire');
+Route::get('/orders/{order}', OrderShow::class)->name('orders.show');
 Route::post('/restaurant/{restaurant}/orders', [OrderController::class, 'store'])
     ->name('restaurants.orders.store');
 Route::get('restaurant/{restaurant}/orders/create', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');

@@ -72,9 +72,10 @@ class OrderCreateLivewireTest extends TestCase
             'name' => 'House Pasta',
         ]);
 
+        $newMenuItem = MenuItem::where('name', 'House Pasta')->firstOrFail();
         $this->assertDatabaseHas('order_items', [
             'order_id' => $order->id,
-            'name' => 'House Pasta',
+            'menu_item_id' => $newMenuItem->id,
             'quantity' => 2,
         ]);
     }

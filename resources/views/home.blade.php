@@ -93,7 +93,7 @@
                         <div class="mt-8 space-y-3">
                             <template x-for="restaurant in filteredRestaurants()" :key="restaurant.id">
                                 <a
-                                    :href="`/restaurant/${restaurant.id}`"
+                                    :href="`{{ route('restaurants.view', ['restaurant' => ':id']) }}`.replace(':id', restaurant.id)"
                                     class="group block rounded-2xl border border-zinc-200 bg-white px-3 py-3 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50"
                                 >
                                     <div class="flex items-center justify-between gap-3">
