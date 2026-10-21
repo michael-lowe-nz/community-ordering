@@ -1,4 +1,4 @@
-<div class="mx-auto max-w-3xl space-y-6 px-4 py-8 text-slate-900 sm:px-6">
+<div class="mx-auto max-w-2xl space-y-6 px-4 py-8 text-slate-900 sm:px-6">
     <header>
         <a href="{{ route('restaurants.view', $order->restaurant) }}" class="text-sm text-orange-600 hover:text-orange-700 transition-colors">&larr; {{ $order->restaurant->name }}</a>
         <p class="mt-4 text-sm text-slate-500">Order from {{ $order->ordered_at?->format('j M Y') ?? $order->created_at?->format('j M Y') }}</p>
