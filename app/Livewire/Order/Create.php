@@ -97,9 +97,8 @@ class Create extends Component
         $menuItem = $this->findExistingMenuItem($name) ?? $this->createMenuItemFromName($name);
 
         $this->order->items()->create([
-            'name' => $menuItem->name,
+            'menu_item_id' => $menuItem->id,
             'quantity' => $this->quantity,
-            'price' => $menuItem->price,
         ]);
 
         $this->query = '';
@@ -127,19 +126,17 @@ class Create extends Component
 
     public function beginEditItem(int $itemId): void
     {
-        $item = $this->order->items()->findOrFail($itemId);
+        $item = $this->order->items()->with('menuItem')->findOrFail($itemId);
 
         $this->editingItemId = $itemId;
-        $this->itemDraftName = $item->name;
+        $this->itemDraftName = $item->menuItem?->name ?? '';
         $this->itemDraftQuantity = max(1, (int) $item->quantity);
     }
 
     public function saveEditedItem(int $itemId): void
     {
-        $name = trim($this->itemDraftName);
-
-        if ($name === '') {
-            $this->addError('itemDraftName', 'Item name is required.');
+        if ((int) $this->itemDraftQuantity < 1) {
+            $this->addError('itemDraftQuantity', 'Quantity must be at least 1.');
 
             return;
         }
@@ -147,7 +144,6 @@ class Create extends Component
         $this->order->items()
             ->whereKey($itemId)
             ->update([
-                'name' => $name,
                 'quantity' => max(1, min(99, (int) $this->itemDraftQuantity)),
             ]);
 
@@ -184,12 +180,11 @@ class Create extends Component
         $this->editingItemId = ($this->editingItemId === $itemId) ? null : $this->editingItemId;
     }
 
-    public function quickAddItem(string $name, ?float $price): void
+    public function quickAddItem(int $menuItemId): void
     {
         $this->order->items()->create([
-            'name' => $name,
+            'menu_item_id' => $menuItemId,
             'quantity' => 1,
-            'price' => $price,
         ]);
     }
 

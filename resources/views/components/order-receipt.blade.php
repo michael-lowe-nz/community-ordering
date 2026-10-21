@@ -10,7 +10,7 @@
             <div class="flex flex-1 flex-col">
                 @forelse ($order->items as $item)
                     <div class="receipt-item">
-                        <p class="receipt-label">{{ $item->name }}</p>
+                        <p class="receipt-label">{{ $item->menuItem->name }}</p>
                         <p class="receipt-value">x {{ $item->quantity }}</p>
                     </div>
                 @empty
