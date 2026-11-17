@@ -4,14 +4,14 @@
             <div class="receipt-header">
                 <p class="receipt-eyebrow">Order</p>
                 <h2 class="receipt-title">{{ $order->title }}</h2>
-                <p class="receipt-subtitle">{{ $order->formattedCreatedAt }} · {{ $order->shortFormattedCreatedAt }}</p>
+                <p class="receipt-subtitle">{{ $order->formattedCreatedAt }} · {{ $order->shortFormattedCreatedAt }}@if ($order->participant_count) · {{ $order->participant_count }} people @endif</p>
             </div>
 
             <div class="flex flex-1 flex-col">
                 @forelse ($order->items as $item)
                     <div class="receipt-item">
-                        <p class="receipt-label">{{ $item->menuItem->name }}</p>
-                        <p class="receipt-value">x {{ $item->quantity }}</p>
+                        <p class="receipt-label">{{ $item->name }}@if ($item->variant) <span class="text-gray-500">({{ $item->variant }})</span>@endif</p>
+                        <p class="receipt-value">x {{ $item->display_quantity }}</p>
                     </div>
                 @empty
                     <div class="receipt-item receipt-item-empty">

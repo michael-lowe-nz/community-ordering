@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\MenuBuilderController;
 use App\Http\Controllers\RestaurantController;
 use App\Livewire\OrderCreate;
 use App\Livewire\OrderShow;
@@ -20,6 +21,14 @@ Route::post('/restaurant/{restaurant}/orders', [OrderController::class, 'store']
 Route::get('restaurant/{restaurant}/orders/create', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');
 Route::get('restaurant/{restaurant}/orders/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('restaurants.orders.show');
 Route::post('restaurant/{restaurant}/orders/{order}', [App\Http\Controllers\OrderController::class, 'addToOrder'])->name('restaurants.orders.addToOrder');
+
+// Menu builder: build what the group is ordering from a restaurant's menu.
+Route::scopeBindings()->group(function () {
+    Route::get('restaurant/{restaurant}/orders/{order}/build', [MenuBuilderController::class, 'show'])
+        ->name('restaurants.orders.build');
+    Route::put('restaurant/{restaurant}/orders/{order}/build', [MenuBuilderController::class, 'sync'])
+        ->name('restaurants.orders.build.sync');
+});
 
 Route::get('/health-check', function () {
     return response('OK', 200);

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,25 +25,23 @@ class OrderController
             'content' => null,
         ]);
 
-        return redirect()
-            ->route('restaurants.orders.show', [$restaurant, $order])
-            ->with('message', 'Order created successfully');
-        //
+        return redirect()->route('restaurants.orders.build', [$restaurant, $order]);
     }
 
     public function addToOrder(Restaurant $restaurant, Order $order, Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|numeric|gt:0',
         ]);
 
-        $orderItem = new OrderItem([
-            'name' => $request->input('name'),
+        $menuItem = $restaurant->findOrCreateMenuItem($request->input('name'));
+
+        $order->items()->create([
+            'menu_item_id' => $menuItem->id,
             'quantity' => $request->input('quantity'),
+            'position' => ($order->items()->max('position') ?? -1) + 1,
         ]);
-
-        $order->items()->save($orderItem);
 
         return redirect()
             ->route('restaurants.orders.show', [$restaurant, $order])

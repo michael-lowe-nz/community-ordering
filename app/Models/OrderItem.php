@@ -10,8 +10,15 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'menu_item_id',
+        'variant',
         'quantity',
         'notes',
+        'position',
+    ];
+
+    protected $casts = [
+        'quantity' => 'float',
+        'position' => 'integer',
     ];
 
     /**
@@ -28,5 +35,21 @@ class OrderItem extends Model
     public function menuItem(): BelongsTo
     {
         return $this->belongsTo(MenuItem::class);
+    }
+
+    /**
+     * The dish name, from the menu item this line references.
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->menuItem?->name ?? '';
+    }
+
+    /**
+     * Quantity without trailing zeros (1, 0.5, 2.5).
+     */
+    public function getDisplayQuantityAttribute(): string
+    {
+        return rtrim(rtrim(number_format($this->quantity, 2, '.', ''), '0'), '.');
     }
 }

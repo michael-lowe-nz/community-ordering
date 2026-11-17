@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RestaurantSeeder::class,
             PickleJarSeeder::class,
+            KcCafeMenuSeeder::class,
         ]);
     }
 }

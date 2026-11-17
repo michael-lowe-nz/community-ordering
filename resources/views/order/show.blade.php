@@ -20,9 +20,14 @@
                             <h2 class="mt-2 text-3xl font-semibold text-slate-900">{{ $order->title }}</h2>
                             <p class="mt-2 text-sm text-gray-600">{{ $order->formattedCreatedAt }} · {{ $order->shortFormattedCreatedAt }}</p>
                         </div>
-                        <a href="{{ route('restaurants.show', $restaurant) }}" class="inline-flex items-center justify-center rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-300">
-                            Back
-                        </a>
+                        <div class="flex gap-2">
+                            <a href="{{ route('restaurants.orders.build', [$restaurant, $order]) }}" class="inline-flex items-center justify-center rounded-md bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-700">
+                                Edit in menu builder
+                            </a>
+                            <a href="{{ route('restaurants.show', $restaurant) }}" class="inline-flex items-center justify-center rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-300">
+                                Back
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -34,10 +39,10 @@
                             @foreach ($orderItems as $item)
                                 <div class="flex items-center justify-between border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
                                     <div>
-                                        <p class="font-medium text-slate-900">{{ $item->name }}</p>
+                                        <p class="font-medium text-slate-900">{{ $item->name }}@if ($item->variant) <span class="text-gray-500">({{ $item->variant }})</span>@endif</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-semibold text-slate-900">x{{ $item->quantity }}</p>
+                                        <p class="text-sm font-semibold text-slate-900">x{{ $item->display_quantity }}</p>
                                     </div>
                                 </div>
                             @endforeach
@@ -67,10 +72,10 @@
                             @foreach ($orderItems as $item)
                                 <div class="flex items-center justify-between border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
                                     <div>
-                                        <p class="font-medium text-slate-900">{{ $item->name }}</p>
+                                        <p class="font-medium text-slate-900">{{ $item->name }}@if ($item->variant) <span class="text-gray-500">({{ $item->variant }})</span>@endif</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-semibold text-slate-900">x{{ $item->quantity }}</p>
+                                        <p class="text-sm font-semibold text-slate-900">x{{ $item->display_quantity }}</p>
                                     </div>
                                 </div>
                             @endforeach
