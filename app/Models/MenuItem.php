@@ -20,12 +20,21 @@ class MenuItem extends Model
         'section',
         'order_index',
         'is_available',
+        'tags',
+        'variants',
+        'unit',
+        'unit_step',
+        'unit_start',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'order_index' => 'integer',
         'is_available' => 'boolean',
+        'tags' => 'array',
+        'variants' => 'array',
+        'unit_step' => 'float',
+        'unit_start' => 'float',
     ];
 
     /**
@@ -65,6 +74,13 @@ class MenuItem extends Model
             'description' => 'nullable|string|max:1000',
             'price' => 'nullable|numeric|min:0|max:999999.99',
             'section' => 'nullable|string|max:100',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string|max:50',
+            'variants' => 'nullable|array',
+            'variants.*' => 'string|max:100',
+            'unit' => 'nullable|in:whole,kg,pcs',
+            'unit_step' => 'nullable|numeric|gt:0',
+            'unit_start' => 'nullable|numeric|gt:0',
         ];
     }
 }

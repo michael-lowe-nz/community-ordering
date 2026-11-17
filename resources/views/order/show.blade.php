@@ -4,6 +4,12 @@
             {{ $restaurant->name }}
         </h1>
         <h2 class="font-semibold text-md text-gray-800 leading-tight">{{ $order->formatted_created_at }}</h2>
+        <div class="mt-4 flex gap-3">
+            <a href="{{ route('restaurants.orders.build', [$restaurant, $order]) }}"
+                class="text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-md font-semibold transition-colors duration-200">Edit in menu builder</a>
+            <a href="{{ url('/restaurant/' . $restaurant->id) }}"
+                class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-md font-semibold transition-colors duration-200">Back to {{ $restaurant->name }}</a>
+        </div>
     </x-slot>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -20,7 +26,7 @@
                     <input type="text" name="name" placeholder="Item Name"
                         class="border border-gray-300 rounded-md p-2 w-full mb-4" autofocus>
                     <label>Quantity:</label>
-                    <input type="number" name="quantity" placeholder="quantity" value="1"
+                    <input type="number" name="quantity" placeholder="quantity" value="1" step="0.5" min="0.5"
                         class="border border-gray-300 rounded-md p-2 w-full mb-4">
                 </div>
                 <button type="submit"

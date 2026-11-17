@@ -17,6 +17,7 @@ class PickleJarSeeder extends Seeder
         // Get or create Pickle Jar restaurant
         $restaurant = Restaurant::firstOrCreate(
             ['name' => 'The Pickle Jar'],
+            ['google_place_id' => 'seed:the-pickle-jar'],
         );
 
         // Order data extracted from notes

@@ -12,14 +12,16 @@
         method="POST" class="inline">
         @csrf
         <button type="submit"
-            class="text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-md font-semibold transition-colors duration-200">Add
-            New Order</button>
+            class="text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-md font-semibold transition-colors duration-200">Build
+            a menu</button>
     </form>
 
     <div class="min-h-screen">
         <div class="md:grid md:grid-cols-4 gap-4">
             @foreach ($orders as $order)
-                <x-order-receipt :order="$order" />
+                <a href="{{ route('restaurants.orders.show', [$restaurant, $order]) }}" class="block">
+                    <x-order-receipt :order="$order" />
+                </a>
             @endforeach
         </div>
     </div>
