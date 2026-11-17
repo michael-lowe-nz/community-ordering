@@ -59,14 +59,6 @@ class Menu extends Model
     }
 
     /**
-     * Scope to get only scraped menus.
-     */
-    public function scopeScraped($query)
-    {
-        return $query->where('menu_type', 'scraped');
-    }
-
-    /**
      * Get validation rules for menu model.
      */
     public static function validationRules(): array
@@ -74,7 +66,7 @@ class Menu extends Model
         return [
             'restaurant_id' => 'required|exists:restaurants,id',
             'name' => 'required|string|max:255',
-            'menu_type' => 'required|in:scraped,manual,seasonal',
+            'menu_type' => 'required|in:manual,seasonal',
             'is_active' => 'boolean',
         ];
     }

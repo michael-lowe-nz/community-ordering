@@ -42,7 +42,7 @@ class MenuBuilderTest extends TestCase
     {
         [$restaurant, $tofu] = $this->restaurantWithMenu();
         $order = $restaurant->orders()->create();
-        $order->items()->create(['name' => 'Mapo Tofu', 'menu_item_id' => $tofu->id, 'quantity' => 2]);
+        $order->items()->create(['menu_item_id' => $tofu->id, 'quantity' => 2]);
 
         $response = $this->get(route('restaurants.orders.build', [$restaurant, $order]));
 
@@ -65,7 +65,7 @@ class MenuBuilderTest extends TestCase
     {
         [$restaurant, $tofu, $duck] = $this->restaurantWithMenu();
         $order = $restaurant->orders()->create();
-        $order->items()->create(['name' => 'Old line', 'quantity' => 1]);
+        $old = $order->items()->create(['menu_item_id' => $tofu->id, 'quantity' => 9]);
 
         $this->putJson(route('restaurants.orders.build.sync', [$restaurant, $order]), [
             'people' => 6,
@@ -81,7 +81,7 @@ class MenuBuilderTest extends TestCase
         $this->assertSame(['Roast Duck', 'Mapo Tofu', 'Spring Rolls'], $order->items->pluck('name')->all());
         $this->assertSame(1.5, $order->items->first()->quantity);
         $this->assertSame('1.5', $order->items->first()->display_quantity);
-        $this->assertDatabaseMissing('order_items', ['name' => 'Old line']);
+        $this->assertDatabaseMissing('order_items', ['id' => $old->id]);
     }
 
     public function test_the_same_dish_can_be_ordered_in_two_variants(): void
@@ -114,9 +114,9 @@ class MenuBuilderTest extends TestCase
 
     public function test_sync_can_clear_the_menu(): void
     {
-        [$restaurant] = $this->restaurantWithMenu();
+        [$restaurant, $tofu] = $this->restaurantWithMenu();
         $order = $restaurant->orders()->create();
-        $order->items()->create(['name' => 'Something', 'quantity' => 1]);
+        $order->items()->create(['menu_item_id' => $tofu->id, 'quantity' => 1]);
 
         $this->putJson(route('restaurants.orders.build.sync', [$restaurant, $order]), ['people' => 2, 'items' => []])
             ->assertOk();
@@ -124,14 +124,32 @@ class MenuBuilderTest extends TestCase
         $this->assertSame(0, $order->items()->count());
     }
 
-    public function test_catalog_ranks_by_order_history_and_includes_past_dishes_not_on_the_menu(): void
+    public function test_typed_dishes_are_added_to_the_menu_once(): void
     {
         [$restaurant] = $this->restaurantWithMenu();
+        $order = $restaurant->orders()->create();
+        $payload = ['people' => 4, 'items' => [
+            ['menuItemId' => null, 'name' => 'Prawn Crackers', 'variant' => '', 'qty' => 1, 'tags' => ['Seafood']],
+        ]];
+
+        $this->putJson(route('restaurants.orders.build.sync', [$restaurant, $order]), $payload)->assertOk();
+        $this->putJson(route('restaurants.orders.build.sync', [$restaurant, $order]), $payload)->assertOk();
+
+        $crackers = MenuItem::where('name', 'Prawn Crackers')->sole();
+        $this->assertSame(['Seafood'], $crackers->tags);
+        $this->assertSame($restaurant->id, $crackers->menu->restaurant_id);
+        $this->assertSame([$crackers->id], $order->items()->pluck('menu_item_id')->all());
+    }
+
+    public function test_catalog_ranks_by_order_history(): void
+    {
+        [$restaurant, $tofu, $duck] = $this->restaurantWithMenu();
+        $crackers = $restaurant->findOrCreateMenuItem('Prawn Crackers');
         foreach (range(1, 3) as $i) {
             $past = $restaurant->orders()->create();
-            $past->items()->create(['name' => 'roast duck', 'quantity' => 1]);
+            $past->items()->create(['menu_item_id' => $duck->id, 'quantity' => 1]);
             if ($i === 1) {
-                $past->items()->create(['name' => 'Prawn Crackers', 'quantity' => 1]);
+                $past->items()->create(['menu_item_id' => $crackers->id, 'quantity' => 1]);
             }
         }
 
@@ -140,7 +158,6 @@ class MenuBuilderTest extends TestCase
         $this->assertSame(['Roast Duck', 'Prawn Crackers', 'Mapo Tofu'], array_column($catalog['items'], 'name'));
         $this->assertSame(3, $catalog['items'][0]['uses']);
         $this->assertSame(['name' => 'whole', 'step' => 0.5, 'start' => 0.5], $catalog['items'][0]['unit']);
-        $this->assertNull($catalog['items'][1]['id']);
         $this->assertSame(['Tofu', 'Spicy', 'Duck'], $catalog['tags']);
     }
 

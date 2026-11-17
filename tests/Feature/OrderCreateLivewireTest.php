@@ -1,0 +1,150 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Livewire\Order\Create as OrderCreate;
+use App\Models\Menu;
+use App\Models\MenuItem;
+use App\Models\Order;
+use App\Models\Restaurant;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class OrderCreateLivewireTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_it_uses_a_dynamic_default_title_for_the_current_day_and_time_period(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-03-15 13:00:00'));
+
+        $restaurant = Restaurant::factory()->create();
+        $user = User::factory()->create();
+        $order = Order::make([
+            'restaurant_id' => $restaurant->id,
+            'user_id' => $user->id,
+            'content' => null,
+        ]);
+
+        $this->assertSame('Saturday lunch', $order->title);
+
+        Livewire::test(OrderCreate::class, ['restaurant' => $restaurant, 'order' => $order])
+            ->assertSet('orderTitle', 'Saturday lunch');
+
+        Carbon::setTestNow();
+    }
+
+    public function test_it_searches_existing_menu_items_and_creates_new_items_when_missing(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $menu = Menu::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'name' => 'Dinner Menu',
+        ]);
+
+        MenuItem::factory()->create([
+            'menu_id' => $menu->id,
+            'name' => 'Classic Burger',
+            'price' => 18.50,
+            'is_available' => true,
+        ]);
+
+        $user = User::factory()->create();
+        $order = Order::create([
+            'restaurant_id' => $restaurant->id,
+            'user_id' => $user->id,
+            'content' => null,
+        ]);
+
+        Livewire::test(OrderCreate::class, ['restaurant' => $restaurant, 'order' => $order])
+            ->set('query', 'Classic')
+            ->assertSet('suggestions', ['Classic Burger'])
+            ->set('query', 'House Pasta')
+            ->set('quantity', 2)
+            ->call('addItem')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('menu_items', [
+            'menu_id' => $menu->id,
+            'name' => 'House Pasta',
+        ]);
+
+        $newMenuItem = MenuItem::where('name', 'House Pasta')->firstOrFail();
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => $order->id,
+            'menu_item_id' => $newMenuItem->id,
+            'quantity' => 2,
+        ]);
+    }
+
+    public function test_it_updates_the_saved_order_title_when_editing(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $user = User::factory()->create();
+        $order = Order::create([
+            'restaurant_id' => $restaurant->id,
+            'user_id' => $user->id,
+            'content' => 'Team lunch',
+        ]);
+
+        Livewire::test(OrderCreate::class, ['restaurant' => $restaurant, 'order' => $order])
+            ->call('startTitleEdit')
+            ->set('orderTitle', 'Updated team lunch')
+            ->call('saveTitle')
+            ->assertSet('orderTitle', 'Updated team lunch')
+            ->assertSet('editingTitle', false);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'content' => 'Updated team lunch',
+        ]);
+    }
+
+    public function test_it_renders_js_safe_suggestion_click_handlers_for_existing_menu_items(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $menu = Menu::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'name' => 'Dinner Menu',
+        ]);
+
+        MenuItem::factory()->create([
+            'menu_id' => $menu->id,
+            'name' => "D'Artagnan Burger",
+            'price' => 22.50,
+            'is_available' => true,
+        ]);
+
+        $user = User::factory()->create();
+        $order = Order::create([
+            'restaurant_id' => $restaurant->id,
+            'user_id' => $user->id,
+            'content' => null,
+        ]);
+
+        $component = Livewire::test(OrderCreate::class, ['restaurant' => $restaurant, 'order' => $order])
+            ->set('query', "D'Art")
+            ->assertSet('suggestions', ["D'Artagnan Burger"]);
+
+        $this->assertStringContainsString('wire:click="chooseSuggestion', $component->html());
+    }
+
+    public function test_the_order_show_page_renders_the_livewire_autocomplete_form(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $user = User::factory()->create();
+        $order = Order::create([
+            'restaurant_id' => $restaurant->id,
+            'user_id' => $user->id,
+            'content' => null,
+        ]);
+
+        $this->get(route('restaurants.orders.show', [$restaurant, $order]))
+            ->assertOk()
+            ->assertSee('Search menu item')
+            ->assertSee('wire:model.live.debounce.200ms');
+    }
+}

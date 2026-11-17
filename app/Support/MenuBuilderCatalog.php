@@ -12,8 +12,8 @@ use Illuminate\Support\Collection;
  * Everything the menu builder needs to know about a restaurant up front, so
  * the page can boot with no extra requests:
  *
- * - the dishes on the restaurant's active menus (with tags, variants, units),
- * - dishes people have ordered there before that aren't on a menu yet,
+ * - the dishes on the restaurant's menus (with tags, variants, units),
+ *   including ones added by typing them into an order,
  * - how often each dish has been ordered, which decides chip order.
  */
 class MenuBuilderCatalog
@@ -22,48 +22,30 @@ class MenuBuilderCatalog
     {
         $uses = self::orderHistory($restaurant, $excluding);
 
-        $menuItems = MenuItem::query()
-            ->whereHas('menu', fn ($q) => $q->where('restaurant_id', $restaurant->id)->where('is_active', true))
+        $items = MenuItem::query()
+            ->whereIn('menu_id', $restaurant->menus()->select('id'))
             ->where('is_available', true)
             ->orderBy('order_index')
             ->orderBy('id')
-            ->get();
-
-        $items = $menuItems->values()->map(function (MenuItem $item, int $i) use ($uses) {
-            $unit = $item->unit ? [
-                'name' => $item->unit,
-                'step' => $item->unit_step ?: 1,
-                'start' => $item->unit_start ?: ($item->unit_step ?: 1),
-            ] : null;
-
-            return [
+            ->get()
+            ->unique(fn (MenuItem $item) => mb_strtolower($item->name))
+            ->values()
+            ->map(fn (MenuItem $item, int $i) => [
                 'id' => $item->id,
                 'name' => $item->name,
                 'tags' => array_values($item->tags ?? []),
                 'variants' => $item->variants ? array_values($item->variants) : null,
-                'unit' => $unit,
-                'uses' => $uses[mb_strtolower($item->name)]['uses'] ?? 0,
+                'unit' => $item->unit ? [
+                    'name' => $item->unit,
+                    'step' => $item->unit_step ?: 1,
+                    'start' => $item->unit_start ?: ($item->unit_step ?: 1),
+                ] : null,
+                'uses' => $uses[$item->id] ?? 0,
                 'rank' => $i,
-            ];
-        });
-
-        $onMenu = $items->mapWithKeys(fn ($item) => [mb_strtolower($item['name']) => true]);
-
-        $fromHistory = collect($uses)
-            ->reject(fn ($row, $key) => isset($onMenu[$key]))
-            ->values()
-            ->map(fn ($row, $i) => [
-                'id' => null,
-                'name' => $row['name'],
-                'tags' => [],
-                'variants' => null,
-                'unit' => null,
-                'uses' => $row['uses'],
-                'rank' => $items->count() + $i,
             ]);
 
         // Most ordered first; menu order breaks ties.
-        $all = $items->concat($fromHistory)
+        $sorted = $items
             ->sort(fn ($a, $b) => [$b['uses'], $a['rank']] <=> [$a['uses'], $b['rank']])
             ->values()
             ->map(function ($item) {
@@ -73,28 +55,27 @@ class MenuBuilderCatalog
             });
 
         return [
-            'items' => $all->all(),
+            'items' => $sorted->all(),
             'tags' => self::tagOrder($items),
         ];
     }
 
     /**
-     * Number of past orders each dish (by case-insensitive name) appeared in.
+     * Number of past orders each menu item appeared in, keyed by menu item id.
      *
-     * @return array<string, array{name: string, uses: int}>
+     * @return array<int, int>
      */
     private static function orderHistory(Restaurant $restaurant, ?Order $excluding): array
     {
         return OrderItem::query()
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->where('orders.restaurant_id', $restaurant->id)
+            ->whereNotNull('order_items.menu_item_id')
             ->when($excluding, fn ($q) => $q->where('orders.id', '!=', $excluding->id))
-            ->selectRaw('LOWER(order_items.name) as name_key, MIN(order_items.name) as name, COUNT(DISTINCT order_items.order_id) as uses')
-            ->groupByRaw('LOWER(order_items.name)')
-            ->orderByDesc('uses')
-            ->orderBy('name')
-            ->get()
-            ->mapWithKeys(fn ($row) => [$row->name_key => ['name' => $row->name, 'uses' => (int) $row->uses]])
+            ->selectRaw('order_items.menu_item_id, COUNT(DISTINCT order_items.order_id) as uses')
+            ->groupBy('order_items.menu_item_id')
+            ->pluck('uses', 'menu_item_id')
+            ->map(fn ($n) => (int) $n)
             ->all();
     }
 

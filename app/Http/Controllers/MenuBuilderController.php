@@ -21,19 +21,19 @@ class MenuBuilderController
 {
     public function show(Restaurant $restaurant, Order $order)
     {
-        $order->load('items');
+        $order->load('items.menuItem');
 
         $props = [
             'restaurant' => [
                 'id' => $restaurant->id,
                 'name' => $restaurant->name,
-                'url' => url("/restaurant/{$restaurant->id}"),
+                'url' => route('restaurants.show', $restaurant),
             ],
             'order' => [
                 'id' => $order->id,
                 'people' => $order->participant_count ?: 4,
                 'createdAt' => $order->created_at?->toIso8601String(),
-                'items' => $order->items->map(fn (OrderItem $item) => [
+                'items' => $order->items->filter(fn (OrderItem $item) => $item->menuItem)->map(fn (OrderItem $item) => [
                     'menuItemId' => $item->menu_item_id,
                     'name' => $item->name,
                     'variant' => $item->variant ?? '',
@@ -52,6 +52,7 @@ class MenuBuilderController
 
     /**
      * Replace the order's lines and head count with what the builder sent.
+     * Dishes typed in that aren't on the menu yet are added to it.
      */
     public function sync(Request $request, Restaurant $restaurant, Order $order): JsonResponse
     {
@@ -62,33 +63,48 @@ class MenuBuilderController
             'items.*.name' => ['required', 'string', 'max:255'],
             'items.*.variant' => ['nullable', 'string', 'max:100'],
             'items.*.qty' => ['required', 'numeric', 'gt:0', 'max:9999'],
+            'items.*.tags' => ['nullable', 'array', 'max:20'],
+            'items.*.tags.*' => ['string', 'max:50'],
         ]);
 
         $ids = collect($data['items'])->pluck('menuItemId')->filter()->unique();
         if ($ids->isNotEmpty()) {
             $valid = MenuItem::whereIn('id', $ids)
-                ->whereHas('menu', fn ($q) => $q->where('restaurant_id', $restaurant->id))
+                ->whereIn('menu_id', $restaurant->menus()->select('id'))
                 ->pluck('id');
             if ($valid->count() !== $ids->count()) {
                 throw ValidationException::withMessages(['items' => 'One or more dishes are not on this restaurant’s menu.']);
             }
         }
 
-        DB::transaction(function () use ($order, $data) {
+        $created = [];
+
+        DB::transaction(function () use ($restaurant, $order, $data, &$created) {
+            $lines = collect($data['items'])->values()->map(function ($line, $i) use ($restaurant, &$created) {
+                $menuItemId = $line['menuItemId'] ?? null;
+
+                if (! $menuItemId) {
+                    $item = $restaurant->findOrCreateMenuItem($line['name'], ['tags' => $line['tags'] ?? []]);
+                    $menuItemId = $created[$item->name] = $item->id;
+                }
+
+                return [
+                    'menu_item_id' => $menuItemId,
+                    'variant' => ($line['variant'] ?? '') !== '' ? $line['variant'] : null,
+                    'quantity' => round((float) $line['qty'], 2),
+                    'position' => $i,
+                ];
+            });
+
             $order->update(['participant_count' => $data['people']]);
             $order->items()->delete();
-            $order->items()->createMany(collect($data['items'])->values()->map(fn ($line, $i) => [
-                'menu_item_id' => $line['menuItemId'] ?? null,
-                'name' => trim($line['name']),
-                'variant' => ($line['variant'] ?? '') !== '' ? $line['variant'] : null,
-                'quantity' => round((float) $line['qty'], 2),
-                'position' => $i,
-            ])->all());
+            $order->items()->createMany($lines->all());
         });
 
         return response()->json([
             'saved' => true,
             'count' => count($data['items']),
+            'menuItemIds' => (object) $created,
             'savedAt' => now()->toIso8601String(),
         ]);
     }

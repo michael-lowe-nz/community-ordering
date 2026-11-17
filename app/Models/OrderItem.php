@@ -10,10 +10,8 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'menu_item_id',
-        'name',
         'variant',
         'quantity',
-        'price',
         'notes',
         'position',
     ];
@@ -32,11 +30,19 @@ class OrderItem extends Model
     }
 
     /**
-     * Get the menu item this line was picked from, if any.
+     * Get the menu item this order item references.
      */
     public function menuItem(): BelongsTo
     {
         return $this->belongsTo(MenuItem::class);
+    }
+
+    /**
+     * The dish name, from the menu item this line references.
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->menuItem?->name ?? '';
     }
 
     /**

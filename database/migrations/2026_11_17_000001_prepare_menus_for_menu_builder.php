@@ -7,11 +7,14 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Shapes the menu tables for the menu builder.
  *
+ * Runs after 2026_08_28_102813, which made order lines reference menu items
+ * (menu_item_id) instead of storing a name.
+ *
  * - Menu items gain the metadata the builder's chips need: filter tags,
  *   variants (e.g. "Pork" / "Fish Fillet") and a unit with its step and
  *   first quantity (e.g. half a whole duck, 0.5 kg of char siu, 5 dumplings).
- * - Order lines can now hold fractional quantities, a variant, a link back to
- *   the menu item they came from, and a stable position.
+ * - Order lines can now hold fractional quantities, a variant and a stable
+ *   position.
  * - The one-row-per-menu-item constraint on menu_item_order is dropped, since
  *   the same dish can now appear once per variant.
  */
@@ -29,8 +32,7 @@ return new class extends Migration
 
         Schema::table('order_items', function (Blueprint $table) {
             $table->decimal('quantity', 8, 2)->default(1)->change();
-            $table->foreignId('menu_item_id')->nullable()->after('order_id')->constrained('menu_items')->nullOnDelete();
-            $table->string('variant', 100)->nullable()->after('name');
+            $table->string('variant', 100)->nullable();
             $table->unsignedInteger('position')->default(0);
         });
 
@@ -50,7 +52,6 @@ return new class extends Migration
         });
 
         Schema::table('order_items', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('menu_item_id');
             $table->dropColumn(['variant', 'position']);
             $table->integer('quantity')->default(1)->change();
         });

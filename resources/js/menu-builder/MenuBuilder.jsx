@@ -43,8 +43,11 @@ export default function MenuBuilder({ restaurant, order, catalog, urls }) {
 
     const snapshot = useMemo(() => ({
         people,
-        items: lines.map(({ menuItemId, name, variant, qty }) => ({ menuItemId, name, variant, qty })),
-    }), [people, lines]);
+        // dishes typed in are added to the restaurant's menu on save, with the filters that were active
+        items: lines.map(({ menuItemId, name, variant, qty }) => (menuItemId
+            ? { menuItemId, name, variant, qty }
+            : { menuItemId, name, variant, qty, tags: (extras.find((x) => x.name === name) || {}).tags || [] })),
+    }), [people, lines, extras]);
     const { status, flush } = useServerSync(urls.sync, snapshot);
 
     // ---- refs --------------------------------------------------------------

@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('restaurant_id')->constrained()->onDelete('cascade');
             $table->string('name')->default('Main Menu');
-            $table->enum('menu_type', ['scraped', 'manual', 'seasonal'])->default('scraped');
+            $table->enum('menu_type', ['manual', 'seasonal'])->default('manual');
             $table->boolean('is_active')->default(true);
-            $table->timestamp('scraped_at')->nullable();
             $table->string('source_url')->nullable();
             $table->timestamps();
-            
+
             $table->index(['restaurant_id', 'is_active']);
         });
     }

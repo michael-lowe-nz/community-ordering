@@ -28,9 +28,8 @@ class MenuFactory extends Factory
         return [
             'restaurant_id' => Restaurant::factory(),
             'name' => $this->faker->randomElement(['Main Menu', 'Lunch Menu', 'Dinner Menu', 'Drinks Menu']),
-            'menu_type' => $this->faker->randomElement(['scraped', 'manual', 'seasonal']),
+            'menu_type' => $this->faker->randomElement(['manual', 'seasonal']),
             'is_active' => true,
-            'scraped_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
             'source_url' => $this->faker->optional()->url(),
         ];
     }
@@ -56,25 +55,12 @@ class MenuFactory extends Factory
     }
 
     /**
-     * Indicate that the menu is scraped.
-     */
-    public function scraped(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'menu_type' => 'scraped',
-            'scraped_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
-            'source_url' => $this->faker->url(),
-        ]);
-    }
-
-    /**
      * Indicate that the menu is manual.
      */
     public function manual(): static
     {
         return $this->state(fn (array $attributes) => [
             'menu_type' => 'manual',
-            'scraped_at' => null,
             'source_url' => null,
         ]);
     }

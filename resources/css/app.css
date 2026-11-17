@@ -48,40 +48,78 @@
   background-repeat: repeat-x;
   background-size: 8px 4px;
   padding: 4px 0;
-}
-
-.receipt-list {
-  background-color: white;
-  height: 100%;
-}
-
-.receipt {
-  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.1));
-  max-width: 320px;
-  margin: 0 auto;
+  filter: drop-shadow(0 2px 8px rgba(15, 23, 42, 0.08));
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 
 .receipt-list {
   background-color: #fff;
-  padding: 30px;
+  padding: 1.25rem;
+  height: 100%;
+}
+
+.receipt-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.receipt-eyebrow {
+  margin: 0 0 0.4rem;
+  color: #6b7280;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.receipt-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 700;
+  color: #111827;
+}
+
+.receipt-subtitle {
+  margin: 0.25rem 0 0;
+  color: #6b7280;
+  font-size: 0.75rem;
 }
 
 .receipt-item {
-  border-bottom: 0.5px dashed #ccc;
-  line-height: 1;
-  overflow: hidden;
-  font-family: monospace;
-  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #d1d5db;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
-.receipt-item:not(:first-child) {
-  margin-top: 1rem;
+.receipt-item:last-child {
+  border-bottom: none;
+}
+
+.receipt-item-empty {
+  padding-top: 0.75rem;
 }
 
 .receipt-label {
-  float: left;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  color: #374151;
 }
 
 .receipt-value {
-  float: right;
+  margin: 0;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
 }
+

@@ -1,0 +1,20 @@
+{
+    "agents": [
+        "copilot",
+        "kiro"
+    ],
+    "cloud": true,
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch": false,
+    "sail": true,
+    "skills": [
+        "infer-conventions",
+        "developing-with-fortify",
+        "laravel-best-practices",
+        "fluxui-development",
+        "livewire-development",
+        "tailwindcss-development",
+        "deploying-laravel-cloud"
+    ]
+}
