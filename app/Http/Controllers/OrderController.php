@@ -23,22 +23,20 @@ class OrderController
             'user_id' => auth()->id(),
             'content' => null,
         ]);
-        return redirect()
-            ->route('restaurants.orders.show', [$restaurant, $order])
-            ->with('message', 'Order created successfully');
-    //
+        return redirect()->route('restaurants.orders.build', [$restaurant, $order]);
     }
 
     public function addToOrder(Restaurant $restaurant, Order $order, Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|numeric|gt:0',
         ]);
 
         $orderItem = new OrderItem([
             'name' => $request->input('name'),
             'quantity' => $request->input('quantity'),
+            'position' => ($order->items()->max('position') ?? -1) + 1,
         ]);
 
         $order->items()->save($orderItem);
