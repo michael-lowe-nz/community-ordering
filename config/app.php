@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'no more no less'),
+    'name' => env('APP_NAME', 'community-ordering'),
 
     /*
     |--------------------------------------------------------------------------

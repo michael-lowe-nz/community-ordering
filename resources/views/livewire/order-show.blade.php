@@ -1,18 +1,21 @@
-<div class="mx-auto max-w-2xl space-y-6 px-4 py-8 text-slate-900 sm:px-6">
-    <header>
-        <a href="{{ route('restaurants.view', $order->restaurant) }}" class="text-sm text-orange-600 hover:text-orange-700 transition-colors">&larr; {{ $order->restaurant->name }}</a>
-        <p class="mt-4 text-sm text-slate-500">Order from {{ $order->ordered_at?->format('j M Y') ?? $order->created_at?->format('j M Y') }}</p>
-        <h1 class="text-3xl font-semibold text-slate-900">{{ $order->title }}</h1>
-        <p class="mt-1 text-slate-600">{{ $order->participant_count }} {{ $order->participant_count === 1 ? 'person' : 'people' }}</p>
-    </header>
+<div class="mx-auto max-w-md space-y-6 px-4 py-8 sm:px-6">
+    <a href="{{ route('restaurants.view', $order->restaurant) }}" class="text-sm text-orange-600 transition-colors hover:text-orange-700">&larr; {{ $order->restaurant->name }}</a>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-5">
-        <x-order-item-list :items="$items" :editable="false" />
-    </section>
+    <x-order-receipt :order="$order">
+        @if ($order->notes)
+            <p class="mt-4 border-t border-gray-200 pt-4 text-sm text-gray-600">{{ $order->notes }}</p>
+        @endif
+    </x-order-receipt>
 
-    @if ($order->notes)
-        <p class="rounded-xl border border-slate-200 bg-white p-5 text-slate-700">{{ $order->notes }}</p>
-    @endif
-
-    <button type="button" wire:click="useAsStartingPoint" class="cursor-pointer rounded-lg bg-orange-600 px-4 py-3 font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">Use as starting point</button>
+    <div class="flex flex-wrap gap-3">
+        @auth
+            <a href="{{ route('orders.build', $order) }}" class="inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">Edit order</a>
+            <form method="POST" action="{{ route('orders.duplicate', $order) }}">
+                @csrf
+                <button type="submit" class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">Use as starting point</button>
+            </form>
+        @else
+            <a href="{{ route('login') }}" class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-50">Log in to edit or reuse this order</a>
+        @endauth
+    </div>
 </div>

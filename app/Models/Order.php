@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrderFactory> */
+    /** @use HasFactory<OrderFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -91,11 +92,14 @@ class Order extends Model
         return $now->translatedFormat('l').' '.$period;
     }
 
-    /** Get the order title with a sensible fallback. */
+    /**
+     * Get the order title, falling back to the day and time of day it was ordered
+     * (e.g. "Tuesday night").
+     */
     public function getTitleAttribute(): string
     {
         $content = trim((string) ($this->content ?? ''));
 
-        return $content !== '' ? $content : self::defaultTitle();
+        return $content !== '' ? $content : self::defaultTitle($this->ordered_at ?? $this->created_at);
     }
 }

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ __('Register') }} - Restaurant Directory</title>
+        <title>{{ __('Register') }} - {{ config('app.name') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -19,13 +19,8 @@
             <!-- Header with Logo -->
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <div class="flex flex-col items-center mb-6">
-                    <div class="flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
-                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
-                    <h1 class="text-2xl font-bold text-gray-900">Join Restaurant Directory</h1>
-                    <p class="text-sm text-gray-600 text-center mt-2">Create your account to start discovering amazing restaurants</p>
+                    <div class="mb-4"><x-authentication-card-logo /></div>
+                    <p class="text-sm text-gray-600 text-center">Create an account to start and edit orders.</p>
                 </div>
 
                 <x-validation-errors class="mb-4" />
@@ -86,13 +81,6 @@
                         ← Back to Home
                     </a>
                 </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="mt-8 text-center">
-                <p class="text-xs text-gray-500">
-                    © {{ date('Y') }} Restaurant Directory. Find your next great meal.
-                </p>
             </div>
         </div>
     </body>

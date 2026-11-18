@@ -2,11 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Models\Order;
 use App\Models\Restaurant;
 use App\Services\OrderGuidance;
 use App\Services\OrderGuidanceCalculator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -46,13 +48,14 @@ class RestaurantView extends Component
         return app(OrderGuidanceCalculator::class)->calculate($this->restaurant, $this->partySize);
     }
 
-    /** @return LengthAwarePaginator<int, \App\Models\Order> */
+    /** @return LengthAwarePaginator<int, Order> */
     public function getOrdersProperty(): LengthAwarePaginator
     {
         $query = $this->restaurant->orders()
+            ->has('items')
             ->with(['items.menuItem'])
-            ->orderByDesc('ordered_at')
-            ->orderByDesc('created_at');
+            ->orderByRaw('coalesce(ordered_at, created_at) desc')
+            ->orderByDesc('id');
 
         if ($this->partySizeFilter !== null) {
             $query->where('participant_count', $this->partySizeFilter);
@@ -62,10 +65,10 @@ class RestaurantView extends Component
             $query->where('user_id', Auth::id());
         }
 
-        return $query->paginate(10);
+        return $query->paginate(12);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.restaurant-view');
     }

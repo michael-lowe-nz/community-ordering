@@ -250,9 +250,10 @@ aws logs tail /aws/ecs/Laravel
 ```
 ## Menu builder
 
-`/restaurant/{restaurant}/orders/{order}/build` is a touch-first page for putting together what a group is ordering. It is a small React app (`resources/js/menu-builder`) mounted from a Blade view, so it boots instantly from server-rendered props and saves in the background:
+`/orders/{order}/build` is a touch-first page for putting together what a group is ordering. It is a small React app (`resources/js/menu-builder`) mounted from a Blade view, so it boots instantly from server-rendered props and saves in the background:
 
 - **Catalog**: `App\Support\MenuBuilderCatalog` loads the restaurant's active menu items (tags, variants, units like ½ whole duck or 0.5 kg) plus dishes from past orders that aren't on a menu, ranked by how often they've been ordered.
 - **Saving**: edits apply locally and are `PUT` to the same URL (debounced, one request at a time, flushed on page hide and before leaving).
-- **Entry points**: "Build a menu" on a restaurant page creates an order and opens the builder; "Edit in menu builder" on an order page reopens it.
+- **Entry points**: "Start an order" on a restaurant page (`/restaurants/{restaurant}`) creates an order and opens the builder; "Edit order" and "Use as starting point" on an order page (`/orders/{order}`) reopen it or copy it into a new one.
+- **Access**: restaurants and orders are public to read; starting or editing an order needs a logged-in account.
 - Seed K.C Cafe's menu with `php artisan db:seed --class=KcCafeMenuSeeder`.

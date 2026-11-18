@@ -4,79 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Restaurant;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderController
 {
-    public function show(Restaurant $restaurant, Order $order)
-    {
-        return view('order.show', compact('restaurant', 'order'))
-            ->with('orderItems', $order->items()->get());
-    }
-
     /**
-     * Store a newly created resource in storage.
+     * Start a new order at a restaurant and open it in the menu builder.
      */
-    public function store(Restaurant $restaurant)
+    public function store(Restaurant $restaurant): RedirectResponse
     {
         $order = $restaurant->orders()->create([
             'user_id' => Auth::id(),
-            'content' => null,
+            'ordered_at' => now(),
         ]);
 
-        return redirect()->route('restaurants.orders.build', [$restaurant, $order]);
-    }
-
-    public function addToOrder(Restaurant $restaurant, Order $order, Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'quantity' => 'required|numeric|gt:0',
-        ]);
-
-        $menuItem = $restaurant->findOrCreateMenuItem($request->input('name'));
-
-        $order->items()->create([
-            'menu_item_id' => $menuItem->id,
-            'quantity' => $request->input('quantity'),
-            'position' => ($order->items()->max('position') ?? -1) + 1,
-        ]);
-
-        return redirect()
-            ->route('restaurants.orders.show', [$restaurant, $order])
-            ->with('message', 'Item added to order successfully');
+        return redirect()->route('orders.build', $order);
     }
 
     /**
-     * Display the specified resource.
+     * Start a new order from a copy of an existing one's dishes and head count.
      */
-    // public function show(Order $order)
-    // {
-    //     return view('order.show', compact('order'));
-    // }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
+    public function duplicate(Order $order): RedirectResponse
     {
-        //
-    }
+        $copy = DB::transaction(function () use ($order): Order {
+            $copy = $order->restaurant->orders()->create([
+                'user_id' => Auth::id(),
+                'participant_count' => $order->participant_count,
+                'ordered_at' => now(),
+            ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
+            $copy->items()->createMany($order->items->map(fn ($item): array => [
+                'menu_item_id' => $item->menu_item_id,
+                'variant' => $item->variant,
+                'quantity' => $item->quantity,
+                'notes' => $item->notes,
+                'position' => $item->position,
+            ])->all());
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Order $order)
-    {
-        //
+            return $copy;
+        });
+
+        return redirect()->route('orders.build', $copy);
     }
 }

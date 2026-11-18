@@ -15,6 +15,6 @@
 </head>
 <body>
     <div id="menu-builder" data-props='@json($props)'></div>
-    <noscript>The menu builder needs JavaScript. <a href="{{ route('restaurants.orders.show', [$restaurant, $order]) }}">View this order</a> instead.</noscript>
+    <noscript>The menu builder needs JavaScript. <a href="{{ route('orders.show', $order) }}">View this order</a> instead.</noscript>
 </body>
 </html>
