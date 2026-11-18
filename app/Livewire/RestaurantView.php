@@ -4,8 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Order;
 use App\Models\Restaurant;
-use App\Services\OrderGuidance;
-use App\Services\OrderGuidanceCalculator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -19,8 +17,6 @@ class RestaurantView extends Component
     use WithPagination;
 
     public Restaurant $restaurant;
-
-    public int $partySize = 4;
 
     public ?int $partySizeFilter = null;
 
@@ -41,11 +37,6 @@ class RestaurantView extends Component
 
         $this->tab = in_array($tab, ['recent', 'your'], true) ? $tab : 'recent';
         $this->resetPage();
-    }
-
-    public function getGuidanceProperty(): OrderGuidance
-    {
-        return app(OrderGuidanceCalculator::class)->calculate($this->restaurant, $this->partySize);
     }
 
     /** @return LengthAwarePaginator<int, Order> */

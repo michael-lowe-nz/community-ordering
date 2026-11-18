@@ -17,7 +17,7 @@ class RestaurantAndOrderPagesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_restaurant_view_renders_guidance_and_recent_orders_as_receipts(): void
+    public function test_restaurant_view_renders_recent_orders_as_receipts(): void
     {
         $restaurant = Restaurant::factory()->create(['name' => 'The Noodle House']);
         $menu = Menu::factory()->for($restaurant)->create();
@@ -27,14 +27,14 @@ class RestaurantAndOrderPagesTest extends TestCase
 
         Livewire::test(RestaurantView::class, ['restaurant' => $restaurant])
             ->assertSee('The Noodle House')
-            ->assertSee('How much to order')
+            ->assertDontSee('How much to order')
             ->assertSee('Friday dinner')
             ->assertSee('Mapo tofu')
             ->assertSee('2 people')
             ->assertSee(route('orders.show', $order), false);
     }
 
-    public function test_party_size_filter_is_independent_from_guidance_party_size(): void
+    public function test_party_size_filter_narrows_the_order_list(): void
     {
         $restaurant = Restaurant::factory()->create();
         $menu = Menu::factory()->for($restaurant)->create();
@@ -46,11 +46,9 @@ class RestaurantAndOrderPagesTest extends TestCase
         $largeOrder->items()->create(['menu_item_id' => $largeDish->id, 'quantity' => 1]);
 
         Livewire::test(RestaurantView::class, ['restaurant' => $restaurant])
-            ->set('partySize', 12)
             ->set('partySizeFilter', 2)
             ->assertSee('Small party dish')
-            ->assertDontSee('Large party dish')
-            ->assertSet('partySize', 12);
+            ->assertDontSee('Large party dish');
     }
 
     public function test_restaurant_view_leaves_out_orders_with_no_dishes(): void

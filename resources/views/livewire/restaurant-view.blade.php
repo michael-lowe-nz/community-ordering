@@ -50,33 +50,6 @@
         </div>
     </header>
 
-    {{-- How Much To Order panel --}}
-    <section class="mb-6 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-        <div class="mb-3 flex items-baseline justify-between gap-2">
-            <h2 class="text-sm font-semibold uppercase tracking-wide text-zinc-800">How much to order</h2>
-            <span class="text-xs text-zinc-500">based on {{ $this->orders->total() }} past {{ $this->orders->total() === 1 ? 'order' : 'orders' }}</span>
-        </div>
-
-        <div class="mb-2 flex items-center justify-between">
-            <label for="party-size-slider" class="text-sm text-zinc-600">Party size</label>
-            <output for="party-size-slider" class="text-xl font-bold text-zinc-900">{{ $partySize }}</output>
-        </div>
-
-        <input
-            id="party-size-slider"
-            type="range"
-            min="1"
-            max="20"
-            wire:model.live="partySize"
-            class="w-full cursor-pointer accent-orange-600"
-            aria-label="Party size for order guidance"
-        >
-
-        <div class="mt-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-center">
-            <x-guidance-summary :guidance="$this->guidance" />
-        </div>
-    </section>
-
     {{-- Tabs --}}
     @auth
         <div class="mb-4 flex overflow-hidden rounded-lg border border-zinc-200 text-sm font-medium">
