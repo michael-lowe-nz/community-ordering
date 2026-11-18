@@ -105,6 +105,13 @@
   border-bottom: none;
 }
 
+.receipt-more {
+  margin: 0.5rem 0 0;
+  color: #6b7280;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
 .receipt-item-empty {
   padding-top: 0.75rem;
 }

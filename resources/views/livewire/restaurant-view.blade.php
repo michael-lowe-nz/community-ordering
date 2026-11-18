@@ -37,54 +37,34 @@
                 </span>
             @endif
         </h1>
+
+        <div class="mt-4">
+            @auth
+                <form method="POST" action="{{ route('restaurants.orders.store', $restaurant) }}">
+                    @csrf
+                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 sm:w-auto">Start an order</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 sm:w-auto">Log in to start an order</a>
+            @endauth
+        </div>
     </header>
 
-    {{-- How Much To Order panel --}}
-    <section class="mb-6 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-        <div class="mb-3 flex items-baseline justify-between gap-2">
-            <h2 class="text-sm font-semibold uppercase tracking-wide text-zinc-800">How much to order</h2>
-            <span class="text-xs text-zinc-500">based on {{ $this->orders->total() }} past {{ $this->orders->total() === 1 ? 'order' : 'orders' }}</span>
-        </div>
-
-        <div class="mb-2 flex items-center justify-between">
-            <label for="party-size-slider" class="text-sm text-zinc-600">Party size</label>
-            <output for="party-size-slider" class="text-xl font-bold text-zinc-900">{{ $partySize }}</output>
-        </div>
-
-        <input
-            id="party-size-slider"
-            type="range"
-            min="1"
-            max="20"
-            wire:model.live="partySize"
-            class="w-full cursor-pointer accent-orange-600"
-            aria-label="Party size for order guidance"
-        >
-
-        <div class="mt-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-center">
-            <x-guidance-summary :guidance="$this->guidance" />
-        </div>
-    </section>
-
     {{-- Tabs --}}
-    <div class="mb-4 flex overflow-hidden rounded-lg border border-zinc-200 text-sm font-medium">
-        <button
-            type="button"
-            wire:click="selectTab('recent')"
-            class="flex-1 cursor-pointer px-3 py-2 transition hover:bg-zinc-50 {{ $tab === 'recent' ? 'bg-zinc-900 text-white hover:bg-zinc-800' : 'bg-white text-zinc-600' }}"
-        >Recent orders</button>
-        @auth
+    @auth
+        <div class="mb-4 flex overflow-hidden rounded-lg border border-zinc-200 text-sm font-medium">
+            <button
+                type="button"
+                wire:click="selectTab('recent')"
+                class="flex-1 cursor-pointer px-3 py-2 transition hover:bg-zinc-50 {{ $tab === 'recent' ? 'bg-zinc-900 text-white hover:bg-zinc-800' : 'bg-white text-zinc-600' }}"
+            >Recent orders</button>
             <button
                 type="button"
                 wire:click="selectTab('your')"
                 class="flex-1 cursor-pointer border-l border-zinc-200 px-3 py-2 transition hover:bg-zinc-50 {{ $tab === 'your' ? 'bg-zinc-900 text-white hover:bg-zinc-800' : 'bg-white text-zinc-600' }}"
             >Your orders</button>
-        @endauth
-        <a
-            href="{{ route('restaurants.orders.create.livewire', $restaurant) }}"
-            class="flex-1 cursor-pointer border-l border-zinc-200 bg-white px-3 py-2 text-center text-zinc-600 transition hover:bg-zinc-50"
-        >Log order</a>
-    </div>
+        </div>
+    @endauth
 
     {{-- Orders list header --}}
     <div class="mb-3 flex items-center justify-between gap-3">
@@ -105,48 +85,18 @@
     </div>
 
     {{-- Orders --}}
-    <div class="space-y-3">
-        @forelse ($this->orders as $order)
-            @php
-                $itemNames = $order->items
-                    ->map(fn ($item) => $item->menuItem?->name)
-                    ->filter()
-                    ->values();
-                $preview = $itemNames->take(3)->implode(', ');
-                $remaining = max(0, $itemNames->count() - 3);
-            @endphp
-
-            <a
-                href="{{ route('orders.show', $order) }}"
-                class="block rounded-xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm"
-            >
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="text-sm font-medium text-zinc-900">
-                            {{ $order->ordered_at?->format('j M') ?? $order->created_at->format('j M') }}
-                            <span class="font-normal text-zinc-500">· party of {{ $order->participant_count }}</span>
-                        </p>
-                        <p class="mt-1 text-sm text-zinc-500">
-                            {{ $preview ?: 'No items recorded' }}@if ($remaining > 0) +{{ $remaining }}@endif
-                        </p>
-                    </div>
-                </div>
-            </a>
-        @empty
-            <p class="py-8 text-center text-sm text-zinc-500">No orders found.</p>
-        @endforelse
+    @if ($this->orders->isEmpty())
+        <p class="py-8 text-center text-sm text-zinc-500">No orders found.</p>
+    @else
+        <div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+            @foreach ($this->orders as $order)
+                <x-order-receipt :order="$order" :href="route('orders.show', $order)" :item-limit="6" wire:key="order-{{ $order->id }}" />
+            @endforeach
+        </div>
 
         @if ($this->orders->hasPages())
-            <div class="pt-2">{{ $this->orders->links() }}</div>
+            <div class="pt-4">{{ $this->orders->links() }}</div>
         @endif
-    </div>
-
-    {{-- Log a new order CTA --}}
-    <div class="mt-8">
-        <a
-            href="{{ auth()->check() ? route('restaurants.orders.create.livewire', $restaurant) : route('login') }}"
-            class="block w-full rounded-xl bg-zinc-900 px-4 py-4 text-center text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-700 focus:ring-offset-2"
-        >+ Log a new order here</a>
-    </div>
+    @endif
 
 </div>

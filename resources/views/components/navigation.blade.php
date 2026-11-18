@@ -9,7 +9,7 @@
                         <div class="flex items-center">
                             <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full mr-2">
                             </div>
-                            <span class="text-xl font-bold text-gray-900">{{ config('app.name', 'no more no less') }}.</span>
+                            <span class="text-xl font-bold text-gray-900">{{ config('app.name') }}.</span>
                         </div>
                     </a>
                 </div>
@@ -18,9 +18,6 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <a href="{{ url('/') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->is('/') ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
                         {{ __('Home') }}
-                    </a>
-                    <a href="{{ url('/restaurant') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->is('restaurant*') ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                        {{ __('Restaurants') }}
                     </a>
                 </div>
             </div>
@@ -110,10 +107,6 @@
                                     {{ __('Profile') }}
                                 </x-dropdown-link>
 
-                                <x-dropdown-link href="{{ route('dashboard') }}">
-                                    {{ __('Dashboard') }}
-                                </x-dropdown-link>
-
                                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                                     <x-dropdown-link href="{{ route('api-tokens.index') }}">
                                         {{ __('API Tokens') }}
@@ -165,9 +158,6 @@
             <a href="{{ url('/') }}" class="block pl-3 pr-4 py-2 border-l-4 {{ request()->is('/') ? 'border-orange-500 text-orange-700 bg-orange-50' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }} text-base font-medium focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
                 {{ __('Home') }}
             </a>
-            <a href="/restaurant" class="block pl-3 pr-4 py-2 border-l-4 {{ request()->is('restaurant*') ? 'border-orange-500 text-orange-700 bg-orange-50' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }} text-base font-medium focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
-                {{ __('Restaurants') }}
-            </a>
         </div>
 
         @auth
@@ -190,10 +180,6 @@
                     <!-- Account Management -->
                     <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
                         {{ __('Profile') }}
-                    </x-responsive-nav-link>
-
-                    <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
                     </x-responsive-nav-link>
 
                     @if (Laravel\Jetstream\Jetstream::hasApiFeatures())

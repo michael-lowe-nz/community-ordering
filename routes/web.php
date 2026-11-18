@@ -1,52 +1,27 @@
 <?php
 
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MenuBuilderController;
-use App\Http\Controllers\RestaurantController;
-use App\Livewire\OrderCreate;
+use App\Http\Controllers\OrderController;
 use App\Livewire\OrderShow;
 use App\Livewire\RestaurantView;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/restaurant', [RestaurantController::class, 'index'])->name('restaurants.index');
-Route::get('/restaurant/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show');
 Route::get('/restaurants/{restaurant}', RestaurantView::class)->name('restaurants.view');
-Route::get('/restaurants/{restaurant}/orders/create', OrderCreate::class)->middleware('auth')->name('restaurants.orders.create.livewire');
 Route::get('/orders/{order}', OrderShow::class)->name('orders.show');
-Route::post('/restaurant/{restaurant}/orders', [OrderController::class, 'store'])
-    ->name('restaurants.orders.store');
-Route::get('restaurant/{restaurant}/orders/create', [App\Http\Controllers\OrderController::class, 'create'])->name('orders.create');
-Route::get('restaurant/{restaurant}/orders/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('restaurants.orders.show');
-Route::post('restaurant/{restaurant}/orders/{order}', [App\Http\Controllers\OrderController::class, 'addToOrder'])->name('restaurants.orders.addToOrder');
 
-// Menu builder: build what the group is ordering from a restaurant's menu.
-Route::scopeBindings()->group(function () {
-    Route::get('restaurant/{restaurant}/orders/{order}/build', [MenuBuilderController::class, 'show'])
-        ->name('restaurants.orders.build');
-    Route::put('restaurant/{restaurant}/orders/{order}/build', [MenuBuilderController::class, 'sync'])
-        ->name('restaurants.orders.build.sync');
+// Creating and editing orders needs an account; reading them doesn't.
+Route::middleware('auth')->group(function () {
+    Route::post('/restaurants/{restaurant}/orders', [OrderController::class, 'store'])->name('restaurants.orders.store');
+    Route::post('/orders/{order}/duplicate', [OrderController::class, 'duplicate'])->name('orders.duplicate');
+
+    // Menu builder: build what the group is ordering from a restaurant's menu.
+    Route::get('/orders/{order}/build', [MenuBuilderController::class, 'show'])->name('orders.build');
+    Route::put('/orders/{order}/build', [MenuBuilderController::class, 'sync'])->name('orders.build.sync');
 });
 
 Route::get('/health-check', function () {
     return response('OK', 200);
-});
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        if (Auth::user()->is_admin) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::middleware('admin')->group(function () {
-        Route::get('/admin/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('admin.dashboard');
-    });
 });

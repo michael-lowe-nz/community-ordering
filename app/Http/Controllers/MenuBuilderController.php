@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Restaurant;
 use App\Support\MenuBuilderCatalog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 /**
  * The menu builder: a React page for putting together what a group will order
@@ -19,15 +19,16 @@ use Illuminate\Validation\ValidationException;
  */
 class MenuBuilderController
 {
-    public function show(Restaurant $restaurant, Order $order)
+    public function show(Order $order): View
     {
+        $restaurant = $order->restaurant;
         $order->load('items.menuItem');
 
         $props = [
             'restaurant' => [
                 'id' => $restaurant->id,
                 'name' => $restaurant->name,
-                'url' => route('restaurants.show', $restaurant),
+                'url' => route('restaurants.view', $restaurant),
             ],
             'order' => [
                 'id' => $order->id,
@@ -42,8 +43,8 @@ class MenuBuilderController
             ],
             'catalog' => MenuBuilderCatalog::for($restaurant, $order),
             'urls' => [
-                'sync' => route('restaurants.orders.build.sync', [$restaurant, $order]),
-                'done' => route('restaurants.orders.show', [$restaurant, $order]),
+                'sync' => route('orders.build.sync', $order),
+                'done' => route('orders.show', $order),
             ],
         ];
 
@@ -54,8 +55,10 @@ class MenuBuilderController
      * Replace the order's lines and head count with what the builder sent.
      * Dishes typed in that aren't on the menu yet are added to it.
      */
-    public function sync(Request $request, Restaurant $restaurant, Order $order): JsonResponse
+    public function sync(Request $request, Order $order): JsonResponse
     {
+        $restaurant = $order->restaurant;
+
         $data = $request->validate([
             'people' => ['required', 'integer', 'min:1', 'max:99'],
             'items' => ['present', 'array', 'max:200'],
