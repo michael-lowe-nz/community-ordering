@@ -26,10 +26,14 @@ test('a new user can build an order and see it saved', async ({ page }, testInfo
         await page.getByRole('link', { name: restaurantName }).first().click();
         await expect(page.getByRole('heading', { name: restaurantName })).toBeVisible();
         await page.getByRole('button', { name: 'Start an order' }).click();
+
+        const startSheet = page.getByRole('dialog', { name: 'Start an order' });
+        await expect(startSheet).toBeVisible();
+        await startSheet.getByRole('button', { name: /Blank order/ }).click();
     });
 
     await test.step('add a dish and a person in the menu builder', async () => {
-        await expect(page.getByRole('heading', { name: 'New menu' })).toBeVisible();
+        await expect(page.getByRole('textbox', { name: 'Order name' })).toBeVisible();
 
         const dishInput = page.getByRole('textbox', { name: 'Add a dish' });
         await dishInput.fill(dishName);
@@ -43,7 +47,7 @@ test('a new user can build an order and see it saved', async ({ page }, testInfo
 
     await test.step('finish and see the saved order', async () => {
         await page.getByRole('link', { name: 'Done' }).click();
-        await expect(page).toHaveURL(/\/orders\/\d+$/);
+        await expect(page).toHaveURL(/\/orders\/\d+(\?.*)?$/);
         await expect(page.getByText(dishName)).toBeVisible();
         await expect(page.getByText('5 people')).toBeVisible();
     });
