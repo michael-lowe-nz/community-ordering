@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForAlpine } from './helpers.js';
 
 const restaurantName = process.env.E2E_RESTAURANT || 'K.C Cafe';
 const dishName = process.env.E2E_DISH || 'Mapo Tofu';
@@ -22,9 +23,11 @@ test('a new user can build an order and see it saved', async ({ page }, testInfo
     });
 
     await test.step('open the restaurant and start an order', async () => {
+        await waitForAlpine(page);
         await page.getByPlaceholder('Search for a spot').fill(restaurantName);
         await page.getByRole('link', { name: restaurantName }).first().click();
         await expect(page.getByRole('heading', { name: restaurantName })).toBeVisible();
+        await waitForAlpine(page);
         await page.getByRole('button', { name: 'Start an order' }).click();
 
         const startSheet = page.getByRole('dialog', { name: 'Start an order' });

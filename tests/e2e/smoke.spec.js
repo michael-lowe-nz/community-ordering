@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForAlpine } from './helpers.js';
 
 const restaurantName = process.env.E2E_RESTAURANT || 'K.C Cafe';
 
@@ -17,6 +18,7 @@ test('the home page loads with its styles and lists restaurants', async ({ page 
     });
 
     await page.goto('/');
+    await waitForAlpine(page);
 
     await expect(page.getByRole('heading', { name: 'find your favourite spots' })).toBeVisible();
     await page.getByPlaceholder('Search for a spot').fill(restaurantName);
