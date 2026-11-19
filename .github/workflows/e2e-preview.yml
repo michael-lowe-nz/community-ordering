@@ -1,0 +1,99 @@
+name: E2E (preview)
+
+# Waits for Laravel Cloud to deploy this pull request's commit to its preview
+# environment, then runs the Playwright tests against it.
+#
+# Needs, in the repository settings:
+#   - secret   LARAVEL_CLOUD_TOKEN          a Laravel Cloud API token
+#   - variable LARAVEL_CLOUD_APPLICATION    the Cloud application's name or ID
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: e2e-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    env:
+      LARAVEL_CLOUD_TOKEN: ${{ secrets.LARAVEL_CLOUD_TOKEN }}
+      LARAVEL_CLOUD_APPLICATION: ${{ vars.LARAVEL_CLOUD_APPLICATION }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check Laravel Cloud settings
+        run: |
+          if [ -z "$LARAVEL_CLOUD_TOKEN" ] || [ -z "$LARAVEL_CLOUD_APPLICATION" ]; then
+            echo "::error::Set the LARAVEL_CLOUD_TOKEN secret and LARAVEL_CLOUD_APPLICATION variable in the repository settings."
+            exit 1
+          fi
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install the Laravel Cloud CLI
+        run: |
+          composer global require laravel/cloud-cli:^0.7.8 --no-interaction --no-progress
+          composer global config bin-dir --absolute 2>/dev/null >> "$GITHUB_PATH"
+
+      - name: Wait for the preview deployment of this commit
+        id: preview
+        run: .github/scripts/wait-for-preview.sh "$LARAVEL_CLOUD_APPLICATION" "${{ github.event.pull_request.head.sha }}"
+
+      - name: Wake the preview and wait until it's healthy
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          for attempt in $(seq 1 36); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$PREVIEW_URL/up" || true)
+            echo "Attempt $attempt: /up returned $status"
+            if [ "$status" = "200" ]; then exit 0; fi
+            sleep 5
+          done
+          echo "::error::$PREVIEW_URL/up never returned 200"
+          exit 1
+
+      - name: Migrate and seed test data on the preview
+        env:
+          PREVIEW_ENV_ID: ${{ steps.preview.outputs.env_id }}
+        run: |
+          cloud command:run "$PREVIEW_ENV_ID" --cmd='php artisan migrate --force' -n
+          cloud command:run "$PREVIEW_ENV_ID" --cmd='php artisan db:seed --class=KcCafeMenuSeeder --force' -n
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright's browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        env:
+          E2E_BASE_URL: ${{ steps.preview.outputs.url }}
+        run: npx playwright test
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
