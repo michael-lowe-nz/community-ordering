@@ -13,24 +13,15 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="font-sans antialiased bg-[#f3f2f1] text-zinc-900">
+    <body class="font-sans antialiased bg-zinc-50 text-zinc-900">
         <x-banner />
 
-        <div class="min-h-screen bg-[#f3f2f1]">
+        <div class="min-h-screen bg-zinc-50">
             <x-navigation />
 
             @php
-                $avatarClasses = [
-                    'bg-rose-100 text-rose-700',
-                    'bg-amber-100 text-amber-700',
-                    'bg-emerald-100 text-emerald-700',
-                    'bg-cyan-100 text-cyan-700',
-                    'bg-violet-100 text-violet-700',
-                    'bg-orange-100 text-orange-700',
-                ];
-
                 $restaurantSearchData = $restaurants
-                    ->map(function ($restaurant) use ($avatarClasses) {
+                    ->map(function ($restaurant) {
                         $letter = mb_substr(trim($restaurant->name), 0, 1, 'UTF-8') ?: 'R';
 
                         return [
@@ -38,8 +29,7 @@
                             'name' => $restaurant->name,
                             'location' => $restaurant->location,
                             'orders_count' => $restaurant->orders_count,
-                            'avatar_class' => $avatarClasses[$restaurant->id % count($avatarClasses)],
-                            'avatar_letter' => strtoupper($letter),
+                                                        'avatar_letter' => strtoupper($letter),
                         ];
                     })
                     ->values()
@@ -55,12 +45,13 @@
                     <div
                         x-data="{
                             query: '',
+                            showAll: false,
                             restaurants: @js($restaurantSearchData),
                             filteredRestaurants() {
                                 const search = this.query.trim().toLowerCase();
 
                                 if (!search) {
-                                    return this.restaurants.slice(0, 6);
+                                    return this.showAll ? this.restaurants : this.restaurants.slice(0, 6);
                                 }
 
                                 return this.restaurants.filter((restaurant) => {
@@ -71,7 +62,7 @@
                         }"
                         class="w-full max-w-3xl"
                     >
-                        <div class="rounded-[32px] border border-zinc-200 bg-[#f7f6f5] p-3 shadow-[0_24px_48px_-36px_rgba(24,24,27,0.45)]">
+                        <div class="rounded-[32px] border border-zinc-200 bg-white p-3">
                             <label for="restaurant-search" class="sr-only">Search for a spot</label>
                             <div class="flex items-center overflow-hidden rounded-full border border-zinc-200 bg-white shadow-inner shadow-zinc-100 transition focus-within:border-zinc-300 focus-within:ring-0">
                                 <input
@@ -81,14 +72,30 @@
                                     placeholder="Search for a spot"
                                     class="w-full appearance-none border-0 bg-transparent py-4 ps-6 pe-4 text-lg text-zinc-700 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
                                 >
-                                <button
-                                    type="button"
-                                    class="mr-1 inline-flex shrink-0 items-center justify-center rounded-full bg-[#e74a69] px-5 py-3 text-sm font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] transition hover:bg-[#dc3d5a] focus:outline-none focus:ring-0"
-                                >
-                                    Find
-                                </button>
                             </div>
                         </div>
+
+                        @if ($yourOrders->isNotEmpty())
+                            <section id="your-orders" class="mt-8" aria-labelledby="your-orders-heading">
+                                <h2 id="your-orders-heading" class="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">Your orders</h2>
+                                <div class="space-y-3">
+                                    @foreach ($yourOrders as $yourOrder)
+                                        <a
+                                            href="{{ $yourOrder->items_count > 0 ? route('orders.show', $yourOrder) : route('orders.build', $yourOrder) }}"
+                                            class="flex items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white px-3 py-3 transition hover:border-zinc-300 hover:bg-zinc-50"
+                                        >
+                                            <div class="min-w-0">
+                                                <div class="truncate text-base font-medium text-zinc-900">{{ $yourOrder->title }}</div>
+                                                <div class="mt-0.5 truncate text-sm text-zinc-500">{{ $yourOrder->restaurant->name }} · {{ $yourOrder->items_count }} {{ Str::plural('dish', $yourOrder->items_count) }}</div>
+                                            </div>
+                                            <span class="shrink-0 rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-600">
+                                                {{ $yourOrder->items_count > 0 ? ($yourOrder->ordered_at ?? $yourOrder->created_at)?->format('j M') : 'Empty' }}
+                                            </span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </section>
+                        @endif
 
                         <div class="mt-8 space-y-3">
                             <template x-for="restaurant in filteredRestaurants()" :key="restaurant.id">
@@ -99,7 +106,7 @@
                                     <div class="flex items-center justify-between gap-3">
                                         <div class="flex min-w-0 items-center gap-3">
                                             <div
-                                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-semibold" :class="restaurant.avatar_class"
+                                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-300 bg-zinc-100 text-sm font-semibold text-zinc-600"
                                                 x-text="restaurant.avatar_letter"
                                             ></div>
 
@@ -119,6 +126,14 @@
                                     </div>
                                 </a>
                             </template>
+
+                            <button
+                                type="button"
+                                x-show="!query.trim() && !showAll && restaurants.length > 6"
+                                x-on:click="showAll = true"
+                                class="w-full cursor-pointer rounded-xl py-2 text-sm font-medium text-zinc-500 transition hover:text-zinc-900"
+                                x-text="`Show all ${restaurants.length} spots`"
+                            ></button>
 
                             <div
                                 x-show="filteredRestaurants().length === 0"

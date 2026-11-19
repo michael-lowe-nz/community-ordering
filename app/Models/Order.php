@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Order extends Model
 {
@@ -101,5 +102,27 @@ class Order extends Model
         $content = trim((string) ($this->content ?? ''));
 
         return $content !== '' ? $content : self::defaultTitle($this->ordered_at ?? $this->created_at);
+    }
+
+    /**
+     * The order as plain text, for pasting into a message or reading out when
+     * phoning it through.
+     */
+    public function toPlainText(): string
+    {
+        $heading = $this->title.' · '.$this->restaurant->name;
+        if ($this->participant_count > 0) {
+            $heading .= ' · '.$this->participant_count.' '.Str::plural('person', $this->participant_count);
+        }
+
+        $lines = $this->items->map(function (OrderItem $item): string {
+            $name = $item->variant ? "{$item->name} ({$item->variant})" : $item->name;
+
+            return "{$name} x {$item->display_quantity}";
+        });
+
+        $notes = trim((string) $this->notes);
+
+        return collect([$heading, '', ...$lines, ...($notes !== '' ? ['', $notes] : [])])->implode("\n");
     }
 }

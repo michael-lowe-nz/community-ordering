@@ -23,7 +23,13 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid curre
 .nav .done:active{background:var(--acc);transform:scale(.96)}
 
 .head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:4px 16px 12px;border-bottom:1px solid var(--line);flex:none}
-.head h1{margin:0;font:700 24px/1.1 var(--font)}
+.head h1{margin:0;font:700 24px/1.1 var(--font);min-width:0;flex:1}
+.head > div:first-child{min-width:0;flex:1}
+.ttl{display:block;width:100%;margin:0 0 0 -6px;padding:2px 6px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink);font:inherit;text-overflow:ellipsis}
+.ttl::placeholder{color:var(--ink);opacity:1}
+.ttl:hover{border-color:var(--line)}
+.ttl:focus{outline:0;border-color:var(--fieldLine);background:var(--field)}
+.ttl:focus::placeholder{color:var(--mut)}
 .head small{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:13px;color:var(--mut)}
 .sync{display:inline-flex;align-items:center;gap:4px;transition:opacity .2s}
 .sync::before{content:"";width:6px;height:6px;border-radius:3px;background:currentColor;opacity:.6}

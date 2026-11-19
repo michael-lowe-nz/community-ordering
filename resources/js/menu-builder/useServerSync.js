@@ -96,5 +96,20 @@ export function useServerSync(url, snapshot) {
         return latest.current === sent.current ? true : pump();
     }, [pump]);
 
-    return { status, flush };
+    /**
+     * Delete the order on the server (used to drop an empty new order), and
+     * stop saving it.
+     */
+    const discard = useCallback(async (discardUrl) => {
+        clearTimeout(timer.current);
+        sent.current = latest.current;
+        const res = await fetch(discardUrl, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf.current },
+        });
+        if (!res.ok) throw new Error('Discard failed: ' + res.status);
+    }, []);
+
+    return { status, flush, discard };
 }

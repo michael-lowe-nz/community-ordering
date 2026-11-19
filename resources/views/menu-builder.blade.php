@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Menu builder · {{ $restaurant->name }}</title>
+    <title>{{ $order->title }} · {{ $restaurant->name }}</title>
     @viteReactRefresh
     @vite('resources/js/menu-builder/main.jsx')
 </head>
