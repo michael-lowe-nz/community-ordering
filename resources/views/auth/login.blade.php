@@ -15,7 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-orange-50 to-red-50">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-zinc-100">
             <!-- Header with Logo -->
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <div class="flex flex-col items-center mb-6">
@@ -26,7 +26,7 @@
                 <x-validation-errors class="mb-4" />
 
                 @session('status')
-                    <div class="mb-4 font-medium text-sm text-green-600 bg-green-50 border border-green-200 rounded-md p-3">
+                    <div class="mb-4 font-medium text-sm text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-md p-3">
                         {{ $value }}
                     </div>
                 @endsession
@@ -36,29 +36,29 @@
 
                     <div>
                         <x-label for="email" value="{{ __('Email') }}" class="text-gray-700 font-medium" />
-                        <x-input id="email" class="block mt-1 w-full border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                        <x-input id="email" class="block mt-1 w-full border-gray-300 focus:border-zinc-400 focus:ring-zinc-400 rounded-md shadow-sm" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                     </div>
 
                     <div class="mt-4">
                         <x-label for="password" value="{{ __('Password') }}" class="text-gray-700 font-medium" />
-                        <x-input id="password" class="block mt-1 w-full border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-md shadow-sm" type="password" name="password" required autocomplete="current-password" />
+                        <x-input id="password" class="block mt-1 w-full border-gray-300 focus:border-zinc-400 focus:ring-zinc-400 rounded-md shadow-sm" type="password" name="password" required autocomplete="current-password" />
                     </div>
 
                     <div class="block mt-4">
                         <label for="remember_me" class="flex items-center">
-                            <x-checkbox id="remember_me" name="remember" class="text-orange-600 focus:ring-orange-500" />
+                            <x-checkbox id="remember_me" name="remember" class="text-zinc-900 focus:ring-zinc-400" />
                             <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                         </label>
                     </div>
 
                     <div class="flex items-center justify-between mt-6">
                         @if (Route::has('password.request'))
-                            <a class="underline text-sm text-orange-600 hover:text-orange-800 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" href="{{ route('password.request') }}">
+                            <a class="underline text-sm text-zinc-900 hover:text-zinc-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-400" href="{{ route('password.request') }}">
                                 {{ __('Forgot your password?') }}
                             </a>
                         @endif
 
-                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700 focus:bg-orange-700 active:bg-orange-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-zinc-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-zinc-700 focus:bg-zinc-700 active:bg-black focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 transition ease-in-out duration-150">
                             {{ __('Log in') }}
                         </button>
                     </div>
@@ -67,7 +67,7 @@
                 <div class="mt-6 text-center">
                     <p class="text-sm text-gray-600">
                         Don't have an account?
-                        <a href="{{ route('register') }}" class="font-medium text-orange-600 hover:text-orange-500">
+                        <a href="{{ route('register') }}" class="font-medium text-zinc-900 hover:text-zinc-400">
                             Sign up here
                         </a>
                     </p>

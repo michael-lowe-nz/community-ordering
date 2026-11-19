@@ -13,24 +13,15 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="font-sans antialiased bg-[#f3f2f1] text-zinc-900">
+    <body class="font-sans antialiased bg-zinc-50 text-zinc-900">
         <x-banner />
 
-        <div class="min-h-screen bg-[#f3f2f1]">
+        <div class="min-h-screen bg-zinc-50">
             <x-navigation />
 
             @php
-                $avatarClasses = [
-                    'bg-rose-100 text-rose-700',
-                    'bg-amber-100 text-amber-700',
-                    'bg-emerald-100 text-emerald-700',
-                    'bg-cyan-100 text-cyan-700',
-                    'bg-violet-100 text-violet-700',
-                    'bg-orange-100 text-orange-700',
-                ];
-
                 $restaurantSearchData = $restaurants
-                    ->map(function ($restaurant) use ($avatarClasses) {
+                    ->map(function ($restaurant) {
                         $letter = mb_substr(trim($restaurant->name), 0, 1, 'UTF-8') ?: 'R';
 
                         return [
@@ -38,8 +29,7 @@
                             'name' => $restaurant->name,
                             'location' => $restaurant->location,
                             'orders_count' => $restaurant->orders_count,
-                            'avatar_class' => $avatarClasses[$restaurant->id % count($avatarClasses)],
-                            'avatar_letter' => strtoupper($letter),
+                                                        'avatar_letter' => strtoupper($letter),
                         ];
                     })
                     ->values()
@@ -71,7 +61,7 @@
                         }"
                         class="w-full max-w-3xl"
                     >
-                        <div class="rounded-[32px] border border-zinc-200 bg-[#f7f6f5] p-3 shadow-[0_24px_48px_-36px_rgba(24,24,27,0.45)]">
+                        <div class="rounded-[32px] border border-zinc-200 bg-white p-3">
                             <label for="restaurant-search" class="sr-only">Search for a spot</label>
                             <div class="flex items-center overflow-hidden rounded-full border border-zinc-200 bg-white shadow-inner shadow-zinc-100 transition focus-within:border-zinc-300 focus-within:ring-0">
                                 <input
@@ -83,7 +73,7 @@
                                 >
                                 <button
                                     type="button"
-                                    class="mr-1 inline-flex shrink-0 items-center justify-center rounded-full bg-[#e74a69] px-5 py-3 text-sm font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] transition hover:bg-[#dc3d5a] focus:outline-none focus:ring-0"
+                                    class="mr-1 inline-flex shrink-0 items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-700 focus:outline-none focus:ring-0"
                                 >
                                     Find
                                 </button>
@@ -99,7 +89,7 @@
                                     <div class="flex items-center justify-between gap-3">
                                         <div class="flex min-w-0 items-center gap-3">
                                             <div
-                                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-semibold" :class="restaurant.avatar_class"
+                                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-300 bg-zinc-100 text-sm font-semibold text-zinc-600"
                                                 x-text="restaurant.avatar_letter"
                                             ></div>
 

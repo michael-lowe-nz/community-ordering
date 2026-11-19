@@ -2,32 +2,7 @@
 
     {{-- Header --}}
     <header class="mb-6">
-        @php
-            $cuisineIcons = [
-                'chinese'     => '🥟🍚🥡',
-                'japanese'    => '🍣🍱🍜',
-                'italian'     => '🍝🍕🫕',
-                'indian'      => '🍛🫓🥘',
-                'mexican'     => '🌮🌯🥑',
-                'thai'        => '🍜🥢🌶',
-                'american'    => '🍔🍟🥤',
-                'french'      => '🥐🫕🍷',
-                'greek'       => '🫒🥙🧆',
-                'korean'      => '🍖🥢🫙',
-                'vietnamese'  => '🍜🥢🌿',
-                'mediterranean' => '🫒🧆🥗',
-            ];
-
-            $cuisineKey = strtolower(trim($restaurant->cuisine_type ?? ''));
-            $icons = $cuisineIcons[$cuisineKey] ?? '🍽';
-            $iconChars = mb_str_split($icons);
-        @endphp
-
-        <div class="mb-3 flex gap-1">
-            @foreach ($iconChars as $icon)
-                <span class="text-3xl leading-none" aria-hidden="true">{{ $icon }}</span>
-            @endforeach
-        </div>
+        <div class="mb-4 flex h-24 items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-zinc-50 text-xs uppercase tracking-widest text-zinc-400" aria-hidden="true">Image</div>
 
         <h1 class="text-2xl font-bold text-zinc-900">
             {{ $restaurant->name }}
@@ -42,10 +17,10 @@
             @auth
                 <form method="POST" action="{{ route('restaurants.orders.store', $restaurant) }}">
                     @csrf
-                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 sm:w-auto">Start an order</button>
+                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 sm:w-auto">Start an order</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 sm:w-auto">Log in to start an order</a>
+                <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 sm:w-auto">Log in to start an order</a>
             @endauth
         </div>
     </header>

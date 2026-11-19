@@ -14,7 +14,7 @@
 
 <{{ $element }}
     @if ($href) href="{{ $href }}" @endif
-    {{ $attributes->class(['receipt block h-full', 'transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500' => $href]) }}
+    {{ $attributes->class(['receipt block h-full', 'transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400' => $href]) }}
 >
     <div class="receipt-list flex h-full flex-col">
         <div class="receipt-header">
