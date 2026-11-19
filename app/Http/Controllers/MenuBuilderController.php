@@ -32,6 +32,8 @@ class MenuBuilderController
             ],
             'order' => [
                 'id' => $order->id,
+                'title' => (string) ($order->content ?? ''),
+                'defaultTitle' => Order::defaultTitle($order->ordered_at ?? $order->created_at),
                 'people' => $order->participant_count ?: 4,
                 'createdAt' => $order->created_at?->toIso8601String(),
                 'items' => $order->items->filter(fn (OrderItem $item) => $item->menuItem)->map(fn (OrderItem $item) => [
@@ -44,7 +46,8 @@ class MenuBuilderController
             'catalog' => MenuBuilderCatalog::for($restaurant, $order),
             'urls' => [
                 'sync' => route('orders.build.sync', $order),
-                'done' => route('orders.show', $order),
+                'done' => route('orders.show', ['order' => $order, 'saved' => 1]),
+                'discard' => route('orders.discard', $order),
             ],
         ];
 
@@ -52,7 +55,8 @@ class MenuBuilderController
     }
 
     /**
-     * Replace the order's lines and head count with what the builder sent.
+     * Replace the order's title, lines and head count with what the builder sent.
+     * A blank title falls back to the day and time of day it was ordered.
      * Dishes typed in that aren't on the menu yet are added to it.
      */
     public function sync(Request $request, Order $order): JsonResponse
@@ -60,6 +64,7 @@ class MenuBuilderController
         $restaurant = $order->restaurant;
 
         $data = $request->validate([
+            'title' => ['nullable', 'string', 'max:100'],
             'people' => ['required', 'integer', 'min:1', 'max:99'],
             'items' => ['present', 'array', 'max:200'],
             'items.*.menuItemId' => ['nullable', 'integer'],
@@ -99,7 +104,11 @@ class MenuBuilderController
                 ];
             });
 
-            $order->update(['participant_count' => $data['people']]);
+            $order->participant_count = $data['people'];
+            if (array_key_exists('title', $data)) {
+                $order->content = trim((string) $data['title']) ?: null;
+            }
+            $order->save();
             $order->items()->delete();
             $order->items()->createMany($lines->all());
         });

@@ -7,7 +7,7 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ url('/') }}" class="transition hover:opacity-75">
                         <div class="flex items-center">
-                            <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full mr-2">
+                            <div class="flex items-center justify-center w-8 h-8 border border-dashed border-zinc-400 rounded-full mr-2">
                             </div>
                             <span class="text-xl font-bold text-gray-900">{{ config('app.name') }}.</span>
                         </div>
@@ -16,9 +16,14 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <a href="{{ url('/') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->is('/') ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                    <a href="{{ url('/') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->is('/') ? 'border-zinc-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
                         {{ __('Home') }}
                     </a>
+                    @auth
+                        <a href="{{ route('home') }}#your-orders" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 text-sm font-medium leading-5 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                            {{ __('Your orders') }}
+                        </a>
+                    @endauth
                 </div>
             </div>
 
@@ -133,7 +138,7 @@
                         <a href="{{ route('login') }}" class="cursor-pointer px-3 py-2 rounded-md text-sm font-medium text-gray-500 transition hover:text-gray-900">
                             {{ __('Log in') }}
                         </a>
-                        <a href="{{ route('register') }}" class="cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-700">
+                        <a href="{{ route('register') }}" class="cursor-pointer rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700">
                             {{ __('Sign up') }}
                         </a>
                     </div>
@@ -155,9 +160,14 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <a href="{{ url('/') }}" class="block pl-3 pr-4 py-2 border-l-4 {{ request()->is('/') ? 'border-orange-500 text-orange-700 bg-orange-50' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }} text-base font-medium focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
+            <a href="{{ url('/') }}" class="block pl-3 pr-4 py-2 border-l-4 {{ request()->is('/') ? 'border-zinc-400 text-zinc-700 bg-zinc-100' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }} text-base font-medium focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
                 {{ __('Home') }}
             </a>
+            @auth
+                <a href="{{ route('home') }}#your-orders" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 text-base font-medium focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
+                    {{ __('Your orders') }}
+                </a>
+            @endauth
         </div>
 
         @auth
