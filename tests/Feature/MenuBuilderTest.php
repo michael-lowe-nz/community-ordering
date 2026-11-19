@@ -81,26 +81,29 @@ class MenuBuilderTest extends TestCase
     public function test_builder_page_boots_with_the_restaurants_menu(): void
     {
         [$restaurant, $tofu] = $this->restaurantWithMenu();
-        $order = $restaurant->orders()->create();
+        $owner = User::factory()->create();
+        $order = $restaurant->orders()->create(['user_id' => $owner->id]);
         $order->items()->create(['menu_item_id' => $tofu->id, 'quantity' => 2]);
 
-        $response = $this->actingAs(User::factory()->create())->get(route('orders.build', $order));
+        $response = $this->actingAs($owner)->get(route('orders.build', $order));
 
         $response->assertOk()
             ->assertSee('id="menu-builder"', false)
             ->assertSee('Roast Duck')
             ->assertSee('Mapo Tofu')
             ->assertSee(json_encode(route('restaurants.view', $restaurant)), false)
-            ->assertSee(json_encode(route('orders.show', $order)), false);
+            ->assertSee(json_encode(route('orders.show', ['order' => $order, 'saved' => 1])), false)
+            ->assertSee(json_encode(route('orders.discard', $order)), false);
     }
 
     public function test_sync_replaces_the_orders_lines_and_head_count(): void
     {
         [$restaurant, $tofu, $duck] = $this->restaurantWithMenu();
-        $order = $restaurant->orders()->create();
+        $owner = User::factory()->create();
+        $order = $restaurant->orders()->create(['user_id' => $owner->id]);
         $old = $order->items()->create(['menu_item_id' => $tofu->id, 'quantity' => 9]);
 
-        $this->actingAs(User::factory()->create())->putJson(route('orders.build.sync', $order), [
+        $this->actingAs($owner)->putJson(route('orders.build.sync', $order), [
             'people' => 6,
             'items' => [
                 ['menuItemId' => $duck->id, 'name' => 'Roast Duck', 'variant' => '', 'qty' => 1.5],
@@ -120,9 +123,10 @@ class MenuBuilderTest extends TestCase
     public function test_the_same_dish_can_be_ordered_in_two_variants(): void
     {
         [$restaurant, $tofu] = $this->restaurantWithMenu();
-        $order = $restaurant->orders()->create();
+        $owner = User::factory()->create();
+        $order = $restaurant->orders()->create(['user_id' => $owner->id]);
 
-        $this->actingAs(User::factory()->create())->putJson(route('orders.build.sync', $order), [
+        $this->actingAs($owner)->putJson(route('orders.build.sync', $order), [
             'people' => 4,
             'items' => [
                 ['menuItemId' => $tofu->id, 'name' => 'Mapo Tofu', 'variant' => 'Mild', 'qty' => 1],
@@ -137,9 +141,10 @@ class MenuBuilderTest extends TestCase
     {
         [$restaurant] = $this->restaurantWithMenu();
         $foreign = MenuItem::factory()->create();
-        $order = $restaurant->orders()->create();
+        $owner = User::factory()->create();
+        $order = $restaurant->orders()->create(['user_id' => $owner->id]);
 
-        $this->actingAs(User::factory()->create())->putJson(route('orders.build.sync', $order), [
+        $this->actingAs($owner)->putJson(route('orders.build.sync', $order), [
             'people' => 4,
             'items' => [['menuItemId' => $foreign->id, 'name' => $foreign->name, 'variant' => '', 'qty' => 1]],
         ])->assertUnprocessable()->assertJsonValidationErrors('items');
@@ -148,10 +153,11 @@ class MenuBuilderTest extends TestCase
     public function test_sync_can_clear_the_menu(): void
     {
         [$restaurant, $tofu] = $this->restaurantWithMenu();
-        $order = $restaurant->orders()->create();
+        $owner = User::factory()->create();
+        $order = $restaurant->orders()->create(['user_id' => $owner->id]);
         $order->items()->create(['menu_item_id' => $tofu->id, 'quantity' => 1]);
 
-        $this->actingAs(User::factory()->create())->putJson(route('orders.build.sync', $order), ['people' => 2, 'items' => []])
+        $this->actingAs($owner)->putJson(route('orders.build.sync', $order), ['people' => 2, 'items' => []])
             ->assertOk();
 
         $this->assertSame(0, $order->items()->count());
@@ -160,13 +166,14 @@ class MenuBuilderTest extends TestCase
     public function test_typed_dishes_are_added_to_the_menu_once(): void
     {
         [$restaurant] = $this->restaurantWithMenu();
-        $order = $restaurant->orders()->create();
+        $owner = User::factory()->create();
+        $order = $restaurant->orders()->create(['user_id' => $owner->id]);
         $payload = ['people' => 4, 'items' => [
             ['menuItemId' => null, 'name' => 'Prawn Crackers', 'variant' => '', 'qty' => 1, 'tags' => ['Seafood']],
         ]];
 
-        $this->actingAs(User::factory()->create())->putJson(route('orders.build.sync', $order), $payload)->assertOk();
-        $this->actingAs(User::factory()->create())->putJson(route('orders.build.sync', $order), $payload)->assertOk();
+        $this->actingAs($owner)->putJson(route('orders.build.sync', $order), $payload)->assertOk();
+        $this->actingAs($owner)->putJson(route('orders.build.sync', $order), $payload)->assertOk();
 
         $crackers = MenuItem::where('name', 'Prawn Crackers')->sole();
         $this->assertSame(['Seafood'], $crackers->tags);

@@ -20,7 +20,7 @@
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <div class="flex flex-col items-center mb-6">
                     <div class="mb-4"><x-authentication-card-logo /></div>
-                    <p class="text-sm text-gray-600 text-center">Log in to start and edit orders.</p>
+                    <p class="text-sm text-gray-600 text-center">{{ \App\Support\LoginIntent::describe(session('url.intended')) ?? 'Log in to start and edit orders.' }}</p>
                 </div>
 
                 <x-validation-errors class="mb-4" />

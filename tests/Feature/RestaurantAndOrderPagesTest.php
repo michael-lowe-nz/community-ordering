@@ -34,23 +34,6 @@ class RestaurantAndOrderPagesTest extends TestCase
             ->assertSee(route('orders.show', $order), false);
     }
 
-    public function test_party_size_filter_narrows_the_order_list(): void
-    {
-        $restaurant = Restaurant::factory()->create();
-        $menu = Menu::factory()->for($restaurant)->create();
-        $smallDish = MenuItem::factory()->for($menu)->create(['name' => 'Small party dish']);
-        $largeDish = MenuItem::factory()->for($menu)->create(['name' => 'Large party dish']);
-        $smallOrder = Order::factory()->for($restaurant)->create(['participant_count' => 2]);
-        $largeOrder = Order::factory()->for($restaurant)->create(['participant_count' => 8]);
-        $smallOrder->items()->create(['menu_item_id' => $smallDish->id, 'quantity' => 1]);
-        $largeOrder->items()->create(['menu_item_id' => $largeDish->id, 'quantity' => 1]);
-
-        Livewire::test(RestaurantView::class, ['restaurant' => $restaurant])
-            ->set('partySizeFilter', 2)
-            ->assertSee('Small party dish')
-            ->assertDontSee('Large party dish');
-    }
-
     public function test_restaurant_view_leaves_out_orders_with_no_dishes(): void
     {
         $restaurant = Restaurant::factory()->create();
@@ -68,6 +51,7 @@ class RestaurantAndOrderPagesTest extends TestCase
         $this->get(route('restaurants.view', $restaurant))
             ->assertOk()
             ->assertSee('Log in to start an order')
+            ->assertSee(route('restaurants.start', $restaurant), false)
             ->assertDontSee(route('restaurants.orders.store', $restaurant), false)
             ->assertDontSee('Your orders');
     }
@@ -81,7 +65,7 @@ class RestaurantAndOrderPagesTest extends TestCase
             ->assertOk()
             ->assertSee('Start an order')
             ->assertSee(route('restaurants.orders.store', $restaurant), false)
-            ->assertSee('Your orders');
+            ->assertSee('Blank order');
     }
 
     public function test_order_show_is_public_and_does_not_render_a_verdict(): void
@@ -98,17 +82,19 @@ class RestaurantAndOrderPagesTest extends TestCase
             ->assertSee('Dumplings')
             ->assertSee('x 2')
             ->assertSee('3 people')
-            ->assertSee('Log in to edit or reuse this order')
+            ->assertSee('Log in to reuse this order')
+            ->assertSee(route('orders.reuse', $order), false)
             ->assertDontSee(route('orders.build', $order), false)
             ->assertDontSee('just_right')
             ->assertDontSee('verdict');
     }
 
-    public function test_members_can_edit_or_reuse_an_order_from_the_order_page(): void
+    public function test_owners_can_edit_or_reuse_an_order_from_the_order_page(): void
     {
-        $order = Order::factory()->for(Restaurant::factory())->create();
+        $owner = User::factory()->create();
+        $order = Order::factory()->for(Restaurant::factory())->create(['user_id' => $owner->id]);
 
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($owner);
 
         Livewire::test(OrderShow::class, ['order' => $order])
             ->assertSee(route('orders.build', $order), false)

@@ -45,12 +45,13 @@
                     <div
                         x-data="{
                             query: '',
+                            showAll: false,
                             restaurants: @js($restaurantSearchData),
                             filteredRestaurants() {
                                 const search = this.query.trim().toLowerCase();
 
                                 if (!search) {
-                                    return this.restaurants.slice(0, 6);
+                                    return this.showAll ? this.restaurants : this.restaurants.slice(0, 6);
                                 }
 
                                 return this.restaurants.filter((restaurant) => {
@@ -71,14 +72,30 @@
                                     placeholder="Search for a spot"
                                     class="w-full appearance-none border-0 bg-transparent py-4 ps-6 pe-4 text-lg text-zinc-700 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
                                 >
-                                <button
-                                    type="button"
-                                    class="mr-1 inline-flex shrink-0 items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-700 focus:outline-none focus:ring-0"
-                                >
-                                    Find
-                                </button>
                             </div>
                         </div>
+
+                        @if ($yourOrders->isNotEmpty())
+                            <section id="your-orders" class="mt-8" aria-labelledby="your-orders-heading">
+                                <h2 id="your-orders-heading" class="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">Your orders</h2>
+                                <div class="space-y-3">
+                                    @foreach ($yourOrders as $yourOrder)
+                                        <a
+                                            href="{{ $yourOrder->items_count > 0 ? route('orders.show', $yourOrder) : route('orders.build', $yourOrder) }}"
+                                            class="flex items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white px-3 py-3 transition hover:border-zinc-300 hover:bg-zinc-50"
+                                        >
+                                            <div class="min-w-0">
+                                                <div class="truncate text-base font-medium text-zinc-900">{{ $yourOrder->title }}</div>
+                                                <div class="mt-0.5 truncate text-sm text-zinc-500">{{ $yourOrder->restaurant->name }} · {{ $yourOrder->items_count }} {{ Str::plural('dish', $yourOrder->items_count) }}</div>
+                                            </div>
+                                            <span class="shrink-0 rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-600">
+                                                {{ $yourOrder->items_count > 0 ? ($yourOrder->ordered_at ?? $yourOrder->created_at)?->format('j M') : 'Empty' }}
+                                            </span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </section>
+                        @endif
 
                         <div class="mt-8 space-y-3">
                             <template x-for="restaurant in filteredRestaurants()" :key="restaurant.id">
@@ -109,6 +126,14 @@
                                     </div>
                                 </a>
                             </template>
+
+                            <button
+                                type="button"
+                                x-show="!query.trim() && !showAll && restaurants.length > 6"
+                                x-on:click="showAll = true"
+                                class="w-full cursor-pointer rounded-xl py-2 text-sm font-medium text-zinc-500 transition hover:text-zinc-900"
+                                x-text="`Show all ${restaurants.length} spots`"
+                            ></button>
 
                             <div
                                 x-show="filteredRestaurants().length === 0"

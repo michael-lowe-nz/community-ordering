@@ -33,6 +33,7 @@ export default function MenuBuilder({ restaurant, order, catalog, urls }) {
         return { key: keyOf({ name, variant: o.variant }), menuItemId: o.menuItemId ?? (item ? item.id : null), name, variant: o.variant || '', qty: o.qty };
     }));
     const [people, setPeople] = useState(order.people);
+    const [title, setTitle] = useState(order.title || '');
     const [isNew] = useState(order.items.length === 0);
     const [sel, setSel] = useState([]);
     const [query, setQuery] = useState('');
@@ -42,13 +43,14 @@ export default function MenuBuilder({ restaurant, order, catalog, urls }) {
     const [pop, setPop] = useState({ key: '', n: 0 });
 
     const snapshot = useMemo(() => ({
+        title: title.trim(),
         people,
         // dishes typed in are added to the restaurant's menu on save, with the filters that were active
         items: lines.map(({ menuItemId, name, variant, qty }) => (menuItemId
             ? { menuItemId, name, variant, qty }
             : { menuItemId, name, variant, qty, tags: (extras.find((x) => x.name === name) || {}).tags || [] })),
-    }), [people, lines, extras]);
-    const { status, flush } = useServerSync(urls.sync, snapshot);
+    }), [title, people, lines, extras]);
+    const { status, flush, discard } = useServerSync(urls.sync, snapshot);
 
     // ---- refs --------------------------------------------------------------
     const appRef = useRef(null), listRef = useRef(null), dockRef = useRef(null), grabRef = useRef(null);
@@ -166,7 +168,12 @@ export default function MenuBuilder({ restaurant, order, catalog, urls }) {
 
     const leave = async (e, href) => {
         e.preventDefault();
-        if (await flush()) window.location.href = href;
+        if (!(await flush())) return;
+        // backing out of a new order with nothing in it throws the order away
+        if (href === restaurant.url && isNew && !lines.length) {
+            await discard(urls.discard).catch(() => {});
+        }
+        window.location.href = href;
     };
 
     // ---- effects -----------------------------------------------------------
@@ -283,13 +290,13 @@ export default function MenuBuilder({ restaurant, order, catalog, urls }) {
 
     // ---- render ------------------------------------------------------------
     const n = lines.length;
-    const glab = snap === PEEK ? 'Add items' : snap === DEFAULT ? 'Hide' : plural(n, 'item') + ' in menu';
+    const glab = snap === PEEK ? 'Add items' : snap === DEFAULT ? 'Hide' : plural(n, 'item') + ' in order';
     const syncLabel = status === 'saving' ? 'Saving…' : status === 'error' ? 'Not saved, retrying' : 'Saved';
 
     return (
         // keep the keyboard up while tapping buttons
         <div className="mb" ref={appRef} onMouseDown={(e) => { if (e.target.closest('button')) e.preventDefault(); }}>
-            <nav className="nav" aria-label="Menu builder">
+            <nav className="nav" aria-label="Order">
                 <a className="back" href={restaurant.url} onClick={(e) => leave(e, restaurant.url)}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
                     <span>{restaurant.name}</span>
@@ -299,7 +306,19 @@ export default function MenuBuilder({ restaurant, order, catalog, urls }) {
 
             <header className="head">
                 <div>
-                    <h1>{isNew ? 'New menu' : 'Menu'}</h1>
+                    <h1>
+                        <input
+                            className="ttl"
+                            type="text"
+                            value={title}
+                            placeholder={order.defaultTitle}
+                            maxLength={100}
+                            enterKeyHint="done"
+                            aria-label="Order name"
+                            onChange={(e) => setTitle(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                        />
+                    </h1>
                     <small>
                         <span>{plural(n, 'item')}</span>
                         <span className={'sync ' + status} role="status" aria-live="polite">{syncLabel}</span>
@@ -378,7 +397,7 @@ export default function MenuBuilder({ restaurant, order, catalog, urls }) {
                                 key={it.name}
                                 className={'chip' + (c ? ' on' : '')}
                                 type="button"
-                                aria-label={c ? it.name + ', ' + c + ' in menu' : undefined}
+                                aria-label={c ? it.name + ', ' + c + ' in order' : undefined}
                                 onClick={() => { add(it.name); inputRef.current.blur(); }}
                             >
                                 {it.name}
