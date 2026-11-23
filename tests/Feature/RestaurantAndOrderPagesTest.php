@@ -193,4 +193,17 @@ class RestaurantAndOrderPagesTest extends TestCase
 
         $this->get(route('orders.show', $order))->assertOk()->assertDontSee('m pizza');
     }
+
+    public function test_pages_do_not_switch_form_fields_to_dark_mode(): void
+    {
+        $owner = User::factory()->create();
+        $order = Order::factory()->for(Restaurant::factory())->create(['user_id' => $owner->id]);
+
+        $this->actingAs($owner)
+            ->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('order-notes', false)
+            ->assertDontSee('color-scheme: dark', false)
+            ->assertDontSee('applyAppearance', false);
+    }
 }
