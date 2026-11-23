@@ -206,4 +206,15 @@ class RestaurantAndOrderPagesTest extends TestCase
             ->assertDontSee('color-scheme: dark', false)
             ->assertDontSee('applyAppearance', false);
     }
+
+    public function test_the_notes_box_is_large_enough_that_phones_do_not_zoom_in(): void
+    {
+        $owner = User::factory()->create();
+        $order = Order::factory()->for(Restaurant::factory())->create(['user_id' => $owner->id]);
+
+        Livewire::actingAs($owner)
+            ->test(OrderShow::class, ['order' => $order])
+            ->assertSeeHtml('id="order-notes"')
+            ->assertSeeHtml('text-base focus:border-zinc-500 focus:ring-zinc-300 sm:text-sm');
+    }
 }
