@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\MenuItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,8 +11,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\MenuItemFactory> */
+    /** @use HasFactory<MenuItemFactory> */
     use HasFactory;
+
+    /** Unit for dishes sold by length, like pizza by the metre. */
+    public const UNIT_METRES = 'm';
 
     protected $fillable = [
         'menu_id',
@@ -87,7 +91,7 @@ class MenuItem extends Model
             'tags.*' => 'string|max:50',
             'variants' => 'nullable|array',
             'variants.*' => 'string|max:100',
-            'unit' => 'nullable|in:whole,kg,pcs',
+            'unit' => 'nullable|in:whole,kg,pcs,m',
             'unit_step' => 'nullable|numeric|gt:0',
             'unit_start' => 'nullable|numeric|gt:0',
         ];

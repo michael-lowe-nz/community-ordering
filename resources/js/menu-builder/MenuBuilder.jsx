@@ -8,7 +8,7 @@ const REDUCED = typeof window !== 'undefined' && window.matchMedia && matchMedia
 
 function QtyLabel({ line, item }) {
     const unit = item && item.unit ? item.unit.name : null;
-    if (unit === 'kg' || unit === 'pcs') return <div className="q">{line.qty}<small>{unit}</small></div>;
+    if (unit === 'kg' || unit === 'pcs' || unit === 'm') return <div className="q">{line.qty}<small>{unit}</small></div>;
     if (unit === 'whole') return <div className="q">{half(line.qty)}×</div>;
     return <div className="q">{line.qty}×</div>;
 }

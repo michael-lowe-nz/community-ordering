@@ -23,11 +23,15 @@ class Order extends Model
         'participant_count',
         'notes',
         'ordered_at',
+        'verdict',
+        'attendees',
+        'attendee_notes',
     ];
 
     protected $casts = [
         'participant_count' => 'integer',
         'ordered_at' => 'datetime',
+        'attendees' => 'array',
     ];
 
     /**
@@ -62,6 +66,28 @@ class Order extends Model
         return $this->belongsToMany(MenuItem::class, 'menu_item_order')
             ->withPivot('quantity', 'price', 'special_requests')
             ->withTimestamps();
+    }
+
+    /**
+     * Metres of pizza in the order: the summed quantity of every line whose
+     * dish is sold by the metre.
+     */
+    public function getPizzaMetresAttribute(): float
+    {
+        return (float) $this->items
+            ->filter(fn (OrderItem $item): bool => $item->menuItem?->unit === MenuItem::UNIT_METRES)
+            ->sum('quantity');
+    }
+
+    /**
+     * Metres of pizza without trailing zeros (2, 2.5, 1.75), or null when the
+     * order has none.
+     */
+    public function getDisplayPizzaMetresAttribute(): ?string
+    {
+        $metres = $this->pizza_metres;
+
+        return $metres > 0 ? rtrim(rtrim(number_format($metres, 2, '.', ''), '0'), '.') : null;
     }
 
     /**

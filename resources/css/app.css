@@ -89,6 +89,15 @@
   font-size: 0.75rem;
 }
 
+.receipt-metres {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 0.5rem;
+}
+
 .receipt-item {
   display: flex;
   justify-content: space-between;
