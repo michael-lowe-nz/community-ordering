@@ -89,7 +89,7 @@
                                                 <div class="mt-0.5 truncate text-sm text-zinc-500">{{ $yourOrder->restaurant->name }} · {{ $yourOrder->items_count }} {{ Str::plural('dish', $yourOrder->items_count) }}</div>
                                             </div>
                                             <span class="shrink-0 rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-600">
-                                                {{ $yourOrder->items_count > 0 ? ($yourOrder->ordered_at ?? $yourOrder->created_at)?->format('j M') : 'Empty' }}
+                                                {{ $yourOrder->items_count > 0 ? \App\Models\Order::inDisplayTimezone($yourOrder->ordered_at ?? $yourOrder->created_at)?->format('j M') : 'Empty' }}
                                             </span>
                                         </a>
                                     @endforeach
