@@ -5,7 +5,7 @@
 ])
 
 @php
-    $orderedAt = $order->ordered_at;
+    $orderedAt = \App\Models\Order::inDisplayTimezone($order->ordered_at);
     $pizzaMetres = $order->display_pizza_metres;
     $metresPerPerson = $pizzaMetres && $order->participant_count > 0
         ? rtrim(rtrim(number_format($order->pizza_metres / $order->participant_count, 2, '.', ''), '0'), '.')
