@@ -119,4 +119,50 @@ class RestaurantAndOrderPagesTest extends TestCase
 
         $this->assertSame('Tuesday night', $order->title);
     }
+
+    public function test_orders_with_no_date_are_listed_after_dated_ones(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $menuItem = MenuItem::factory()->for(Menu::factory()->for($restaurant))->create();
+
+        $undated = Order::factory()->for($restaurant)->create(['content' => 'From the old notes', 'ordered_at' => null]);
+        $dated = Order::factory()->for($restaurant)->create(['content' => 'Last Friday', 'ordered_at' => now()->subYear()]);
+        foreach ([$undated, $dated] as $order) {
+            $order->items()->create(['menu_item_id' => $menuItem->id, 'quantity' => 1]);
+        }
+
+        Livewire::test(RestaurantView::class, ['restaurant' => $restaurant])
+            ->assertSeeInOrder(['Last Friday', 'From the old notes'])
+            ->assertSeeInOrder([now()->subYear()->format('D j M Y'), 'Last Friday', 'From the old notes'])
+            ->assertDontSee('Date not noted');
+    }
+
+    public function test_receipts_total_the_metres_of_pizza_ordered(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $menu = Menu::factory()->for($restaurant)->create();
+        $pizza = MenuItem::factory()->for($menu)->create(['name' => 'Amore', 'unit' => MenuItem::UNIT_METRES]);
+        $fries = MenuItem::factory()->for($menu)->create(['name' => 'Fries']);
+        $order = Order::factory()->for($restaurant)->create(['participant_count' => 3, 'ordered_at' => now()]);
+        $order->items()->createMany([
+            ['menu_item_id' => $pizza->id, 'quantity' => 0.75],
+            ['menu_item_id' => $fries->id, 'quantity' => 2],
+        ]);
+
+        $this->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('0.75m pizza')
+            ->assertSee('0.25m each')
+            ->assertSee('x 2');
+    }
+
+    public function test_receipts_leave_out_metres_when_nothing_is_sold_by_the_metre(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $menuItem = MenuItem::factory()->for(Menu::factory()->for($restaurant))->create();
+        $order = Order::factory()->for($restaurant)->create();
+        $order->items()->create(['menu_item_id' => $menuItem->id, 'quantity' => 2]);
+
+        $this->get(route('orders.show', $order))->assertOk()->assertDontSee('m pizza');
+    }
 }

@@ -31,6 +31,7 @@ class RestaurantView extends Component
         return $this->restaurant->orders()
             ->has('items')
             ->with(['items.menuItem'])
+            ->orderByRaw('ordered_at is null')
             ->orderByRaw('coalesce(ordered_at, created_at) desc')
             ->orderByDesc('id')
             ->paginate(12);
