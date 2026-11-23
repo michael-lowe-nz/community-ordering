@@ -65,7 +65,8 @@ class PickleJarSeeder extends Seeder
 
     /**
      * The orders from the notes, oldest first. Each item is
-     * [dish, quantity, variant, notes]; pizza quantities are metres.
+     * [dish, quantity, variant, notes]; pizza quantities are metres. The
+     * order's note becomes its title.
      *
      * Names (attendees, attendee_notes) are only shown to signed-in users.
      *
@@ -254,13 +255,12 @@ class PickleJarSeeder extends Seeder
 
             $menuItemIds = $this->seedMenu($menu);
 
-            foreach (self::ORDERS as $number => $orderData) {
+            foreach (self::ORDERS as $orderData) {
                 $order = $restaurant->orders()->create([
                     'user_id' => null,
-                    'content' => 'Pickle Jar notes #'.($number + 1),
+                    'content' => $orderData['notes'] ?? 'Pizza night',
                     'participant_count' => $orderData['people'],
                     'verdict' => $orderData['verdict'],
-                    'notes' => $orderData['notes'] ?? null,
                     'attendees' => $orderData['attendees'] ?? null,
                     'attendee_notes' => $orderData['attendee_notes'] ?? null,
                     'ordered_at' => null,

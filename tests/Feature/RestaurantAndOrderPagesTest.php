@@ -133,7 +133,8 @@ class RestaurantAndOrderPagesTest extends TestCase
 
         Livewire::test(RestaurantView::class, ['restaurant' => $restaurant])
             ->assertSeeInOrder(['Last Friday', 'From the old notes'])
-            ->assertSee('Date not noted');
+            ->assertSeeInOrder([now()->subYear()->format('D j M Y'), 'Last Friday', 'From the old notes'])
+            ->assertDontSee('Date not noted');
     }
 
     public function test_receipts_total_the_metres_of_pizza_ordered(): void

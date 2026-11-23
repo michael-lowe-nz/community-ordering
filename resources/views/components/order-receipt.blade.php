@@ -22,7 +22,9 @@
 >
     <div class="receipt-list flex h-full flex-col">
         <div class="receipt-header">
-            <p class="receipt-eyebrow">{{ $orderedAt?->format('D j M Y') ?? 'Date not noted' }}</p>
+            @if ($orderedAt)
+                <p class="receipt-eyebrow">{{ $orderedAt->format('D j M Y') }}</p>
+            @endif
             <h2 class="receipt-title">{{ $order->title }}</h2>
             @if ($order->participant_count > 0)
                 <p class="receipt-subtitle">{{ $order->participant_count }} {{ Str::plural('person', $order->participant_count) }}</p>

@@ -41,21 +41,22 @@ class PickleJarSeederTest extends TestCase
         $this->assertCount(24, $orders);
 
         $first = $orders->first();
-        $this->assertSame('Pickle Jar notes #1', $first->content);
+        $this->assertSame('About perfect.', $first->title);
+        $this->assertNull($first->notes);
         $this->assertSame(8, $first->participant_count);
         $this->assertSame('just_right', $first->verdict);
-        $this->assertSame('About perfect.', $first->notes);
+        $this->assertSame('Pizza night', $orders[11]->title);
         $this->assertSame(2.0, $first->pizza_metres);
 
         $fourteen = $orders->firstWhere('participant_count', 14);
         $this->assertSame(3.5, $fourteen->pizza_metres);
         $this->assertCount(14, $fourteen->attendees);
 
-        $halfAndHalf = $orders->firstWhere('content', 'Pickle Jar notes #13');
+        $halfAndHalf = $orders[12];
         $this->assertSame(2.0, $halfAndHalf->pizza_metres);
         $this->assertSame(0.25, $halfAndHalf->items->firstWhere('name', 'Margherita')->quantity);
 
-        $wings = $orders->firstWhere('content', 'Pickle Jar notes #21');
+        $wings = $orders[20];
         $this->assertSame(2.5, $wings->pizza_metres);
         $this->assertSame('Full', $wings->items->firstWhere('name', 'Korean Wings')->variant);
     }
@@ -99,9 +100,9 @@ class PickleJarSeederTest extends TestCase
             ->assertDontSee('Annaleise');
 
         Livewire::test(RestaurantView::class, ['restaurant' => $restaurant])
-            ->assertSee('Pickle Jar notes #24')
             ->assertSee('Too much, maybe should have had…')
-            ->assertSee('Pickle Jar notes #16')
+            ->assertSee('Pizza night')
+            ->assertDontSee('Pickle Jar notes')
             ->assertDontSee('Annaleise');
     }
 
