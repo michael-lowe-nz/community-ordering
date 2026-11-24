@@ -19,7 +19,7 @@
                 wire:model="notes"
                 rows="3"
                 placeholder="Dietary needs, pickup time, who's paying…"
-                class="block w-full rounded-lg border-zinc-300 text-sm focus:border-zinc-500 focus:ring-zinc-300"
+                class="block w-full rounded-lg border-zinc-300 bg-white text-base text-zinc-900 focus:border-zinc-500 focus:ring-zinc-300 sm:text-sm"
             ></textarea>
             @error('notes') <p class="text-sm text-zinc-900">{{ $message }}</p> @enderror
             <div class="flex items-center gap-3">

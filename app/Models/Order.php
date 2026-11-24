@@ -101,12 +101,20 @@ class Order extends Model
     /** Get the short formatted date of creation time. */
     public function getShortFormattedCreatedAtAttribute(): string
     {
-        return $this->created_at->format('d M j, Y');
+        return self::inDisplayTimezone($this->created_at)->format('d M j, Y');
+    }
+
+    /**
+     * A stored (UTC) time in the timezone the group orders in.
+     */
+    public static function inDisplayTimezone(?\DateTimeInterface $time): ?Carbon
+    {
+        return $time ? Carbon::instance($time)->setTimezone(config('app.display_timezone')) : null;
     }
 
     public static function defaultTitle(?\DateTimeInterface $date = null): string
     {
-        $now = $date ? Carbon::instance($date) : now();
+        $now = self::inDisplayTimezone($date ?? now());
 
         $period = match (true) {
             $now->hour >= 22 || $now->hour < 5 => 'night',

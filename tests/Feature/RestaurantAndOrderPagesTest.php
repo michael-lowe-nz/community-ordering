@@ -114,10 +114,38 @@ class RestaurantAndOrderPagesTest extends TestCase
     {
         $order = Order::factory()->for(Restaurant::factory())->create([
             'content' => null,
-            'ordered_at' => '2026-11-10 19:30:00', // a Tuesday evening
+            'ordered_at' => '2026-11-10 06:30:00', // stored in UTC: 7:30pm Tuesday in Wellington
         ]);
 
         $this->assertSame('Tuesday night', $order->title);
+    }
+
+    public function test_untitled_orders_are_named_in_the_display_timezone(): void
+    {
+        config(['app.display_timezone' => 'UTC']);
+
+        $order = Order::factory()->for(Restaurant::factory())->create([
+            'content' => null,
+            'ordered_at' => '2026-11-10 06:30:00',
+        ]);
+
+        $this->assertSame('Tuesday morning', $order->title);
+    }
+
+    public function test_receipts_show_the_date_in_new_zealand_time(): void
+    {
+        $restaurant = Restaurant::factory()->create();
+        $menuItem = MenuItem::factory()->for(Menu::factory()->for($restaurant))->create();
+        $order = Order::factory()->for($restaurant)->create([
+            'content' => 'Friday dinner',
+            'ordered_at' => '2026-11-12 18:00:00', // UTC Thursday evening is Friday 7am in Wellington
+        ]);
+        $order->items()->create(['menu_item_id' => $menuItem->id, 'quantity' => 1]);
+
+        $this->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('Fri 13 Nov 2026')
+            ->assertDontSee('Thu 12 Nov 2026');
     }
 
     public function test_orders_with_no_date_are_listed_after_dated_ones(): void
@@ -126,14 +154,14 @@ class RestaurantAndOrderPagesTest extends TestCase
         $menuItem = MenuItem::factory()->for(Menu::factory()->for($restaurant))->create();
 
         $undated = Order::factory()->for($restaurant)->create(['content' => 'From the old notes', 'ordered_at' => null]);
-        $dated = Order::factory()->for($restaurant)->create(['content' => 'Last Friday', 'ordered_at' => now()->subYear()]);
+        $dated = Order::factory()->for($restaurant)->create(['content' => 'Last Friday', 'ordered_at' => '2025-11-14 06:00:00']);
         foreach ([$undated, $dated] as $order) {
             $order->items()->create(['menu_item_id' => $menuItem->id, 'quantity' => 1]);
         }
 
         Livewire::test(RestaurantView::class, ['restaurant' => $restaurant])
             ->assertSeeInOrder(['Last Friday', 'From the old notes'])
-            ->assertSeeInOrder([now()->subYear()->format('D j M Y'), 'Last Friday', 'From the old notes'])
+            ->assertSeeInOrder(['Fri 14 Nov 2025', 'Last Friday', 'From the old notes'])
             ->assertDontSee('Date not noted');
     }
 
@@ -164,5 +192,30 @@ class RestaurantAndOrderPagesTest extends TestCase
         $order->items()->create(['menu_item_id' => $menuItem->id, 'quantity' => 2]);
 
         $this->get(route('orders.show', $order))->assertOk()->assertDontSee('m pizza');
+    }
+
+    public function test_pages_do_not_switch_form_fields_to_dark_mode(): void
+    {
+        $owner = User::factory()->create();
+        $order = Order::factory()->for(Restaurant::factory())->create(['user_id' => $owner->id]);
+
+        $this->actingAs($owner)
+            ->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('order-notes', false)
+            ->assertDontSee('color-scheme: dark', false)
+            ->assertDontSee('applyAppearance', false)
+            ->assertSee('<meta name="color-scheme" content="light">', false);
+    }
+
+    public function test_the_notes_box_is_large_enough_that_phones_do_not_zoom_in(): void
+    {
+        $owner = User::factory()->create();
+        $order = Order::factory()->for(Restaurant::factory())->create(['user_id' => $owner->id]);
+
+        Livewire::actingAs($owner)
+            ->test(OrderShow::class, ['order' => $order])
+            ->assertSeeHtml('id="order-notes"')
+            ->assertSeeHtml('bg-white text-base text-zinc-900 focus:border-zinc-500 focus:ring-zinc-300 sm:text-sm');
     }
 }
